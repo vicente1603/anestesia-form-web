@@ -1,13 +1,7 @@
-import 'dart:convert';
 import 'dart:html' as html;
-import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'package:http_parser/http_parser.dart';
-
 import '../../../core/core.dart';
-import '../../../utils/utils.dart';
 import '../../features.dart';
 
 class PatientFormPage extends StatefulWidget {
