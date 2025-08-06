@@ -39,6 +39,14 @@ class _PatientFormPageState extends State<PatientFormPage> {
   Future<void> _validateToken() async {
     final token = Uri.base.queryParameters['token'];
 
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('patients')
+            .where('token', isEqualTo: token)
+            .where('formStatus', isEqualTo: 'pending')
+            .limit(1)
+            .get();
+
     if (token == null || token.isEmpty) {
       setState(() {
         isLoading = false;
@@ -46,13 +54,6 @@ class _PatientFormPageState extends State<PatientFormPage> {
       });
       return;
     }
-
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection('patients')
-            .where('token', isEqualTo: token)
-            .limit(1)
-            .get();
 
     setState(() {
       isTokenValid = snapshot.docs.isNotEmpty;
