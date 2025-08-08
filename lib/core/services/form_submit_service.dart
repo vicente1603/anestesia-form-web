@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:typed_data';
+import 'package:anestesia_web/core/core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class FormSubmitService {
     }
   }
 
-  static Future<void> submitForm(
+  static Future<FormResult> submitForm(
     FormDataModel model,
     html.File? arquivoSelecionado,
     BuildContext context,
@@ -80,21 +81,12 @@ class FormSubmitService {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Dados enviados com sucesso!')),
-        );
+        return FormSuccess();
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Erro ao enviar dados.')));
+        return FormFailure('Erro ao enviar formulário. Tente novamente.');
       }
     } on DioException catch (e) {
-      print('Status code: ${e.response?.statusCode}');
-      print('Response data: ${e.response?.data}');
-      print('Response headers: ${e.response?.headers}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: ${e.response?.data ?? e.message}')),
-      );
+      return FormFailure('Erro ao acessar a API');
     }
   }
 }

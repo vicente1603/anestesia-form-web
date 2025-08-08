@@ -21,19 +21,7 @@ class _PatientFormPageState extends State<PatientFormPage> {
   @override
   void initState() {
     super.initState();
-
     _validateToken();
-  }
-
-  Future<bool> isValidToken(String token) async {
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection('patients')
-            .where('token', isEqualTo: token)
-            .limit(1)
-            .get();
-
-    return snapshot.docs.isNotEmpty;
   }
 
   Future<void> _validateToken() async {
@@ -76,49 +64,125 @@ class _PatientFormPageState extends State<PatientFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme;
+
     if (isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (!isTokenValid) {
-      return const Scaffold(
-        body: Center(child: Text("Token inválido ou expirado.")),
+      return Scaffold(
+        body: Center(
+          child: Text(
+            "Token inválido ou expirado.",
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: color.error,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Formulário Pré-Anestésico")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: formKey,
+      backgroundColor: color.background,
+      appBar: AppBar(
+        title: const Text("Formulário Pré-Anestésico"),
+        backgroundColor: color.primary,
+        foregroundColor: color.onPrimary,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              FormFields(model: model),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: selecionarArquivo,
-                icon: const Icon(Icons.upload_file),
-                label: Text(
-                  arquivoSelecionado == null
-                      ? 'Selecionar arquivo'
-                      : 'Arquivo selecionado: ${arquivoSelecionado!.name}',
+              Icon(Icons.assignment_rounded, size: 72, color: color.primary),
+              const SizedBox(height: 16),
+              Text(
+                'Formulário Pré-Anestésico',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color.primary,
                 ),
               ),
-              const SizedBox(height: 20),
-              SubmitButton(
-                onPressed: () async {
-                  if (formKey.currentState?.validate() ?? false) {
-                    await FormSubmitService.submitForm(
-                      model,
-                      arquivoSelecionado,
-                      context,
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Formulário enviado!")),
-                    );
-                  }
-                },
+              const SizedBox(height: 8),
+              Text(
+                'Preencha com suas informações antes da consulta.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: color.onBackground.withOpacity(0.7),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Form(
+                key: formKey,
+                child: Column(
+                  children: [
+                    FormFields(model: model),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: selecionarArquivo,
+                        icon: const Icon(Icons.upload_file),
+                        label: Text(
+                          arquivoSelecionado == null
+                              ? 'Selecionar arquivo'
+                              : 'Arquivo: ${arquivoSelecionado!.name}',
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: color.primary,
+                          foregroundColor: color.onPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (formKey.currentState?.validate() ?? false) {
+                            final result = await FormSubmitService.submitForm(
+                              model,
+                              arquivoSelecionado,
+                              context,
+                            );
+
+                            if (result is FormSuccess) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Formulário enviado!"),
+                                ),
+                              );
+                            } else if (result is FormFailure) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(result.message)),
+                              );
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: color.primary,
+                          foregroundColor: color.onPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Enviar',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

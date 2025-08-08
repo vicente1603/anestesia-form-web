@@ -3,12 +3,9 @@ import 'package:anestesia_web/features/patient_form/ui/patient_form_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const FormularioPacienteApp());
 }
 
@@ -20,6 +17,14 @@ class FormularioPacienteApp extends StatelessWidget {
     return MaterialApp(
       title: 'Formulário Pré-Anestésico',
       home: PatientFormPage(),
+      debugShowCheckedModeBanner: false,
+      theme: appTheme,
     );
   }
 }
+
+final ThemeData appTheme = ThemeData(
+  colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF4DA1FF)),
+  useMaterial3: true,
+  fontFamily: 'Roboto',
+);
