@@ -49,7 +49,7 @@ class _PatientFormPageState extends State<PatientFormPage> {
     });
   }
 
-  void selecionarArquivo() {
+  void _selectFile() {
     final uploadInput =
         html.FileUploadInputElement()..accept = 'image/*,application/pdf';
     uploadInput.click();
@@ -125,7 +125,7 @@ class _PatientFormPageState extends State<PatientFormPage> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: selecionarArquivo,
+                        onPressed: _selectFile,
                         icon: const Icon(Icons.upload_file),
                         label: Text(
                           arquivoSelecionado == null
