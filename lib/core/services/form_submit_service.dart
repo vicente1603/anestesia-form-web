@@ -33,16 +33,25 @@ class FormSubmitService {
   static Future<FormResult> submitForm(
     FormDataModel model,
     html.File? arquivoSelecionado,
-    BuildContext context,
   ) async {
     try {
       final dio = Dio();
       final formData = FormData();
 
+      final String? token = getTokenFromUrl();
+      if (token == null) return FormFailure('Token não encontrado na URL.');
+
+      final String? patientId = await fetchPatientIdByToken(token);
+      if (patientId == null) {
+        return FormFailure('Token inválido ou paciente não encontrado.');
+      }
+
+      formData.fields.add(MapEntry('patientId', patientId));
+
       final dynamicData = {
-        "age": model.age,
-        "weight": model.weight,
-        "height": model.height,
+        "age": model.age.toString(),
+        "weight": model.weight.toString(),
+        "height": model.height.toString(),
         "surgery": model.surgery,
         "allergies": model.allergies,
         "diseases": model.diseases,
@@ -53,40 +62,38 @@ class FormSubmitService {
         "previous_surgeries": model.previousSurgeries,
       };
 
-      final String? patientId = await fetchPatientIdByToken(getTokenFromUrl()!);
-
-      formData.fields.add(MapEntry('data', json.encode(dynamicData)));
-
-      formData.fields.add(MapEntry('patientId', json.encode(patientId)));
+      dynamicData.forEach((key, value) {
+        formData.fields.add(MapEntry('data[$key]', value!));
+      });
 
       if (arquivoSelecionado != null) {
         final reader = html.FileReader();
-        reader.readAsArrayBuffer(arquivoSelecionado!);
+        reader.readAsArrayBuffer(arquivoSelecionado);
         await reader.onLoad.first;
         final bytes = reader.result as Uint8List;
 
         final multipartFile = MultipartFile.fromBytes(
           bytes,
-          filename: arquivoSelecionado!.name,
-          contentType: MediaType('application', 'octet-stream'),
+          filename: arquivoSelecionado.name,
+          contentType: MediaType.parse(arquivoSelecionado.type),
         );
-
         formData.files.add(MapEntry('fileUrl', multipartFile));
       }
 
-      final response = await dio.post(
-        'http://localhost:3000/v1/analysis',
-        data: formData,
-        options: Options(contentType: 'multipart/form-data'),
-      );
+      await dio.post('http://localhost:3000/v1/analysis', data: formData);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return FormSuccess();
-      } else {
-        return FormFailure('Erro ao enviar formulário. Tente novamente.');
-      }
+      return FormSuccess();
     } on DioException catch (e) {
-      return FormFailure('Erro ao acessar a API');
+      if (e.response != null) {
+        debugPrint("ERRO DO SERVIDOR: ${e.response?.data}");
+        final message =
+            e.response?.data?['message'] ?? 'Ocorreu um erro desconhecido.';
+        return FormFailure('Falha na API: $message');
+      }
+      return FormFailure('Erro de conexão: ${e.message}');
+    } catch (e) {
+      debugPrint("ERRO INESPERADO: $e");
+      return FormFailure('Ocorreu um erro inesperado: $e');
     }
   }
 }

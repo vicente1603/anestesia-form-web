@@ -151,7 +151,6 @@ class _PatientFormPageState extends State<PatientFormPage> {
                             final result = await FormSubmitService.submitForm(
                               model,
                               arquivoSelecionado,
-                              context,
                             );
 
                             if (result is FormSuccess) {
