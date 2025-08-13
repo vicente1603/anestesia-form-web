@@ -49,17 +49,18 @@ class FormSubmitService {
       formData.fields.add(MapEntry('patientId', patientId));
 
       final dynamicData = {
-        "age": model.age.toString(),
-        "weight": model.weight.toString(),
-        "height": model.height.toString(),
         "surgery": model.surgery,
+        "surgeon": model.surgeon,
         "allergies": model.allergies,
         "diseases": model.diseases,
         "medications": model.medications,
+        "smokes": model.smokes,
         "drugs": model.drugs,
-        "icu_history": model.icuHistory,
+        "icuHistory": model.icuHistory,
         "disabilities": model.disabilities,
-        "previous_surgeries": model.previousSurgeries,
+        "previousSurgeries": model.previousSurgeries,
+        "postOpComplications": model.postOpComplications,
+        "familyAnesthesiaHistory": model.familyAnesthesiaHistory,
       };
 
       dynamicData.forEach((key, value) {
