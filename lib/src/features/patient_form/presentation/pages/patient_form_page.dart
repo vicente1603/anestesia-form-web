@@ -1,11 +1,12 @@
 import 'dart:html' as html;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
-import '../../features.dart';
+import '../../../features.dart';
 
 class PatientFormPage extends StatefulWidget {
-  const PatientFormPage({super.key});
+  final PatientFormPresenter presenter;
+
+  const PatientFormPage({super.key, required this.presenter});
 
   @override
   State<PatientFormPage> createState() => _PatientFormPageState();
@@ -21,6 +22,7 @@ class _PatientFormPageState extends State<PatientFormPage> {
   @override
   void initState() {
     super.initState();
+    widget.presenter.init();
     _validateToken();
   }
 
@@ -157,7 +159,7 @@ class _PatientFormPageState extends State<PatientFormPage> {
                             key: formKey,
                             child: Column(
                               children: [
-                                FormFields(model: model),
+                                FormFields(presenter: widget.presenter),
                                 const SizedBox(height: 24),
                                 SizedBox(
                                   width: double.infinity,
@@ -186,11 +188,8 @@ class _PatientFormPageState extends State<PatientFormPage> {
                                     onPressed: () async {
                                       if (formKey.currentState?.validate() ??
                                           false) {
-                                        final result =
-                                            await FormSubmitService.submitForm(
-                                              model,
-                                              arquivoSelecionado,
-                                            );
+                                        final result = await widget.presenter
+                                            .submit(arquivoSelecionado);
 
                                         if (result is FormSuccess) {
                                           ScaffoldMessenger.of(

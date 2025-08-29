@@ -1,21 +1,23 @@
-import 'dart:convert';
-import 'dart:html' as html;
 import 'dart:typed_data';
-import 'package:anestesia_web/core/core.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
-import '../../features/patient_form/models/form_data_model.dart';
+import '../../../features.dart';
+import 'dart:html' as html;
 
-class FormSubmitService {
-  static String? getTokenFromUrl() {
+class PatientFormRepositoryImpl implements PatientFormRepository {
+
+  PatientFormRepositoryImpl();
+
+  String? getTokenFromUrl() {
     final uri =
         Uri.base; // Exemplo: https://anestesia-app.web.app/formulario?token=XYZ123
     return uri.queryParameters['token'];
   }
 
-  static Future<String?> fetchPatientIdByToken(String token) async {
+  Future<String?> fetchPatientIdByToken(String token) async {
     final querySnapshot =
         await FirebaseFirestore.instance
             .collection('patients')
@@ -30,8 +32,9 @@ class FormSubmitService {
     }
   }
 
-  static Future<FormResult> submitForm(
-    FormDataModel model,
+  @override
+  Future<FormResult> submitForm(
+    FormDataEntity formDataEntity,
     html.File? arquivoSelecionado,
   ) async {
     try {
@@ -49,18 +52,18 @@ class FormSubmitService {
       formData.fields.add(MapEntry('patientId', patientId));
 
       final dynamicData = {
-        "surgery": model.surgery,
-        "surgeon": model.surgeon,
-        "allergies": model.allergies,
-        "diseases": model.diseases,
-        "medications": model.medications,
-        "smokes": model.smokes,
-        "drugs": model.drugs,
-        "icuHistory": model.icuHistory,
-        "disabilities": model.disabilities,
-        "previousSurgeries": model.previousSurgeries,
-        "postOpComplications": model.postOpComplications,
-        "familyAnesthesiaHistory": model.familyAnesthesiaHistory,
+        "surgery": formDataEntity.surgery,
+        "surgeon": formDataEntity.surgeon,
+        "allergies": formDataEntity.allergies,
+        "diseases": formDataEntity.diseases,
+        "medications": formDataEntity.medications,
+        "smokes": formDataEntity.smokes,
+        "drugs": formDataEntity.drugs,
+        "icu_history": formDataEntity.icuHistory,
+        "disabilities": formDataEntity.disabilities,
+        "previous_surgeries": formDataEntity.previousSurgeries,
+        "postOpComplications": formDataEntity.postOpComplications,
+        "previous_anesthesia": formDataEntity.familyAnesthesiaHistory,
       };
 
       dynamicData.forEach((key, value) {
