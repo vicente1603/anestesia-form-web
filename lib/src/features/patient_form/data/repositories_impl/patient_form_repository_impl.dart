@@ -8,7 +8,6 @@ import '../../../features.dart';
 import 'dart:html' as html;
 
 class PatientFormRepositoryImpl implements PatientFormRepository {
-
   PatientFormRepositoryImpl();
 
   String? getTokenFromUrl() {
@@ -30,6 +29,52 @@ class PatientFormRepositoryImpl implements PatientFormRepository {
     } else {
       return null;
     }
+  }
+
+  @override
+  Future<bool> validateToken() async {
+    final token = Uri.base.queryParameters['token'];
+
+    if (token == null || token.isEmpty) {
+      return false;
+    }
+
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('patients')
+            .where('token', isEqualTo: token)
+            .where('formStatus', isEqualTo: 'pending')
+            .limit(1)
+            .get();
+
+    return snapshot.docs.isNotEmpty;
+  }
+
+  @override
+  Future<InfoEntity?> getPatientInfo() async {
+    final token = Uri.base.queryParameters['token'];
+
+    if (token == null || token.isEmpty) {
+      return null;
+    }
+
+    final String? patientId = await fetchPatientIdByToken(token);
+    if (patientId == null) {
+      return null;
+    }
+
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('patients')
+            .doc(patientId)
+            .get();
+
+    if (!snapshot.exists || snapshot.data() == null) {
+      return null;
+    }
+    final data = snapshot.data() as Map<String, dynamic>;
+
+    return InfoModel.fromMap(data);
   }
 
   @override
@@ -64,6 +109,11 @@ class PatientFormRepositoryImpl implements PatientFormRepository {
         "previous_surgeries": formDataEntity.previousSurgeries,
         "postOpComplications": formDataEntity.postOpComplications,
         "previous_anesthesia": formDataEntity.familyAnesthesiaHistory,
+        "age": "32",
+        "weight": "110",
+        "height": "1.54",
+        "imc": "46.4",
+        "gender": "Feminino",
       };
 
       dynamicData.forEach((key, value) {

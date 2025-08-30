@@ -6,4 +6,9 @@ abstract class PatientFormRepository {
     FormDataEntity formData,
     html.File? arquivoSelecionado,
   );
+
+  Future<bool> validateToken();
+
+  Future<InfoEntity?> getPatientInfo();
+
 }
