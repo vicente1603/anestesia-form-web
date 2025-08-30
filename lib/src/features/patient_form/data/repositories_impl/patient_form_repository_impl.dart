@@ -1,21 +1,22 @@
-import 'dart:convert';
-import 'dart:html' as html;
 import 'dart:typed_data';
-import 'package:anestesia_web/core/core.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
-import '../../features/patient_form/models/form_data_model.dart';
+import '../../../features.dart';
+import 'dart:html' as html;
 
-class FormSubmitService {
-  static String? getTokenFromUrl() {
+class PatientFormRepositoryImpl implements PatientFormRepository {
+  PatientFormRepositoryImpl();
+
+  String? getTokenFromUrl() {
     final uri =
         Uri.base; // Exemplo: https://anestesia-app.web.app/formulario?token=XYZ123
     return uri.queryParameters['token'];
   }
 
-  static Future<String?> fetchPatientIdByToken(String token) async {
+  Future<String?> fetchPatientIdByToken(String token) async {
     final querySnapshot =
         await FirebaseFirestore.instance
             .collection('patients')
@@ -30,8 +31,55 @@ class FormSubmitService {
     }
   }
 
-  static Future<FormResult> submitForm(
-    FormDataModel model,
+  @override
+  Future<bool> validateToken() async {
+    final token = Uri.base.queryParameters['token'];
+
+    if (token == null || token.isEmpty) {
+      return false;
+    }
+
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('patients')
+            .where('token', isEqualTo: token)
+            .where('formStatus', isEqualTo: 'pending')
+            .limit(1)
+            .get();
+
+    return snapshot.docs.isNotEmpty;
+  }
+
+  @override
+  Future<InfoEntity?> getPatientInfo() async {
+    final token = Uri.base.queryParameters['token'];
+
+    if (token == null || token.isEmpty) {
+      return null;
+    }
+
+    final String? patientId = await fetchPatientIdByToken(token);
+    if (patientId == null) {
+      return null;
+    }
+
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('patients')
+            .doc(patientId)
+            .get();
+
+    if (!snapshot.exists || snapshot.data() == null) {
+      return null;
+    }
+    final data = snapshot.data() as Map<String, dynamic>;
+
+    return InfoModel.fromMap(data);
+  }
+
+  @override
+  Future<FormResult> submitForm(
+    FormDataEntity formDataEntity,
     html.File? arquivoSelecionado,
   ) async {
     try {
@@ -49,18 +97,23 @@ class FormSubmitService {
       formData.fields.add(MapEntry('patientId', patientId));
 
       final dynamicData = {
-        "surgery": model.surgery,
-        "surgeon": model.surgeon,
-        "allergies": model.allergies,
-        "diseases": model.diseases,
-        "medications": model.medications,
-        "smokes": model.smokes,
-        "drugs": model.drugs,
-        "icuHistory": model.icuHistory,
-        "disabilities": model.disabilities,
-        "previousSurgeries": model.previousSurgeries,
-        "postOpComplications": model.postOpComplications,
-        "familyAnesthesiaHistory": model.familyAnesthesiaHistory,
+        "surgery": formDataEntity.surgery,
+        "surgeon": formDataEntity.surgeon,
+        "allergies": formDataEntity.allergies,
+        "diseases": formDataEntity.diseases,
+        "medications": formDataEntity.medications,
+        "smokes": formDataEntity.smokes,
+        "drugs": formDataEntity.drugs,
+        "icu_history": formDataEntity.icuHistory,
+        "disabilities": formDataEntity.disabilities,
+        "previous_surgeries": formDataEntity.previousSurgeries,
+        "postOpComplications": formDataEntity.postOpComplications,
+        "previous_anesthesia": formDataEntity.familyAnesthesiaHistory,
+        "age": "32",
+        "weight": "110",
+        "height": "1.54",
+        "imc": "46.4",
+        "gender": "Feminino",
       };
 
       dynamicData.forEach((key, value) {
