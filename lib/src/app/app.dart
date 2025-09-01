@@ -14,7 +14,7 @@ class FormularioPacienteApp extends StatelessWidget {
 
     final app = MaterialApp(
       title: 'Formulário Pré-Anestésico',
-      home: PatientFormPage(presenter: DM.get()),
+      initialRoute: '/login-admin',
       debugShowCheckedModeBanner: false,
       theme: appTheme,
       routes: moduleManager.routes ?? {},

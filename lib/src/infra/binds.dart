@@ -8,14 +8,18 @@ abstract class AppBinds {
 
   static void _repositories(Injector i) {
     i.registerFactory<PatientFormRepository>(PatientFormRepositoryImpl());
+
+    i.registerFactory<AdminRepository >(AdminRepositoryImpl(FirebaseAuth.instance, FirebaseFirestore.instance));
+
   }
 
   static void _presenters(Injector i) {
+    i.registerFactory<PatientFormPresenter>(
+      PatientFormPresenter(patientFormRepository: i.get()),
+    );
 
-        i.registerFactory<PatientFormPresenter>(
-      PatientFormPresenter(
-        patientFormRepository: i.get(),
-      ),
+        i.registerFactory<LoginAdminPresenter>(
+      LoginAdminPresenter(adminmRepository: i.get()),
     );
   }
 }
