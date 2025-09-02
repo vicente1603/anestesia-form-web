@@ -13,10 +13,12 @@ class FormularioPacienteApp extends StatelessWidget {
 
     final app = MaterialApp(
       title: 'Formulário Pré-Anestésico',
+      navigatorKey: navigatorKey,
       initialRoute: '/admin-login',
       debugShowCheckedModeBanner: false,
       theme: appTheme,
-      routes: moduleManager.routes ?? {},
+      onGenerateRoute:
+          (settings) => AppRouter.onGenerateRoute(settings, moduleManager),
     );
 
     if (providers.isNotEmpty) {

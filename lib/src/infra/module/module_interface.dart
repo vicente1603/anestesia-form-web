@@ -14,4 +14,3 @@ abstract class ModuleInterface {
   List<SingleChildWidget>? providers(Injector injector);
   FutureOr<void> registerServices(Injector injector);
 }
-

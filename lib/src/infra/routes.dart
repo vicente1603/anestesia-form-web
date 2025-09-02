@@ -1,11 +1,15 @@
 part of 'module/module_interface.dart';
 
 abstract class Routes {
+  static const patientForm = '/patient-form';
+  static const adminLogin = '/admin-login';
+  static const adminHome = '/admin-home';
+  static const registerDoctor = '/register-doctor';
+
   static Map<String, WidgetBuilder> routes(Injector i) => {
-    '/patient-form': (context) => PatientFormPage(presenter: i.get(), token: '',),
-    '/admin-login': (context) => AdminLoginPage(presenter: i.get()),
-    '/admin-home': (context) => AdminHomePage(presenter: i.get()),
-    '/register-doctor':
-        (context) => RegisterDoctorPage(presenter: i.get()),
+    patientForm: (context) => PatientFormPage(presenter: i.get(), token: ''),
+    adminLogin: (context) => AdminLoginPage(presenter: i.get()),
+    adminHome: (context) => AdminHomePage(presenter: i.get()),
+    registerDoctor: (context) => RegisterDoctorPage(presenter: i.get()),
   };
 }
