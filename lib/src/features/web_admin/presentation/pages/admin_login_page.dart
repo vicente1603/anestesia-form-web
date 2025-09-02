@@ -1,19 +1,16 @@
-import 'dart:html' as html;
-import 'package:anestesia_web/src/common/ui_state.dart';
 import 'package:flutter/material.dart';
 import '../../../features.dart';
-import 'package:intl/intl.dart';
 
-class LoginAdminPage extends StatefulWidget {
-  final LoginAdminPresenter presenter;
+class AdminLoginPage extends StatefulWidget {
+  final AdminPresenter presenter;
 
-  const LoginAdminPage({super.key, required this.presenter});
+  const AdminLoginPage({super.key, required this.presenter});
 
   @override
-  State<LoginAdminPage> createState() => _LoginAdminPageState();
+  State<AdminLoginPage> createState() => _AdminLoginPageState();
 }
 
-class _LoginAdminPageState extends State<LoginAdminPage> {
+class _AdminLoginPageState extends State<AdminLoginPage> {
   final formKey = GlobalKey<FormState>();
 
   static final emailController = TextEditingController();
@@ -105,7 +102,7 @@ class _LoginAdminPageState extends State<LoginAdminPage> {
 
                     final user = widget.presenter.user;
                     if (user != null && user.role == 'admin') {
-                      Navigator.pushReplacementNamed(context, '/home-admin');
+                      Navigator.pushReplacementNamed(context, '/admin-home');
                     } else {
                       ScaffoldMessenger.of(
                         context,

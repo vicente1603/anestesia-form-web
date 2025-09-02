@@ -1,3 +1,4 @@
-export 'login_admin_page.dart';
-export 'login_admin_presenter.dart';
-export './home_admin_page.dart';
+export './admin_login_page.dart';
+export './admin_presenter.dart';
+export './admin_home_page.dart';
+export './register_doctor_page.dart';

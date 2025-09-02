@@ -6,9 +6,9 @@ abstract class AdminRepository {
   
   Future<void> signOut();
 
-  Future<void> getDoctors();
+  Future<List<DoctorEntity>> getDoctors();
 
-  Future<void> registerDoctor();
+  Future<void> registerDoctor(DoctorEntity doctor, String password);
 
-  Future<void> deleteDoctor();
+  Future<void> deleteDoctor(DoctorEntity doctor);
 }

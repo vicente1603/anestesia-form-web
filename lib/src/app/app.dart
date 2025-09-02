@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../features/features.dart';
 import '../infra/infra.dart';
 
 class FormularioPacienteApp extends StatelessWidget {
@@ -14,7 +13,7 @@ class FormularioPacienteApp extends StatelessWidget {
 
     final app = MaterialApp(
       title: 'Formulário Pré-Anestésico',
-      initialRoute: '/login-admin',
+      initialRoute: '/admin-login',
       debugShowCheckedModeBanner: false,
       theme: appTheme,
       routes: moduleManager.routes ?? {},
