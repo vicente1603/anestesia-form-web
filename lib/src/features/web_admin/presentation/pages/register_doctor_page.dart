@@ -140,7 +140,7 @@ class _RegisterDoctorPageState extends State<RegisterDoctorPage> {
                                           ),
                                         ),
                                       );
-                                      Navigator.pop(context);
+                                      Navigator.of(context).pop(true);
                                     }
                                   },
                                   style: ElevatedButton.styleFrom(

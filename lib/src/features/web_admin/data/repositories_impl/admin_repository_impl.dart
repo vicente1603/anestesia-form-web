@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../../features.dart';
 
 class AdminRepositoryImpl implements AdminRepository {
@@ -31,6 +31,7 @@ class AdminRepositoryImpl implements AdminRepository {
         'name': userName,
         'role': 'admin',
         'createdAt': FieldValue.serverTimestamp(),
+        'blocked': false,
       });
     }
 
@@ -58,36 +59,27 @@ class AdminRepositoryImpl implements AdminRepository {
 
   @override
   Future<void> registerDoctor(DoctorEntity doctor, String password) async {
-    final secondaryApp = await Firebase.initializeApp(
-      name: 'SecondaryApp',
-      options: Firebase.app().options,
-    );
-
     try {
-      final secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
-
-      final userCredential = await secondaryAuth.createUserWithEmailAndPassword(
-        email: doctor.email,
-        password: password,
-      );
-
-      final uid = userCredential.user!.uid;
-
       final userMap = {
-        'uid': uid,
         'name': doctor.fullName,
         'email': doctor.email,
-        'role': 'doctor',
         'crm': doctor.crm,
-        'createdAt': FieldValue.serverTimestamp(),
+        'password': password,
       };
 
-      await _firestore.collection('users').doc(uid).set(userMap);
+      final data = {"data": userMap};
 
-      await secondaryAuth.signOut();
-      await secondaryApp.delete();
+      final dio = Dio();
+
+      dio.post('http://localhost:3000/v1/doctor', data: data);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        debugPrint("ERRO DO SERVIDOR: ${e.response?.data}");
+        final message =
+            e.response?.data?['message'] ?? 'Ocorreu um erro desconhecido.';
+      }
     } catch (e) {
-      rethrow;
+      debugPrint("ERRO INESPERADO: $e");
     }
   }
 

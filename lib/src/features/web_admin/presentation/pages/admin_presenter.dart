@@ -51,6 +51,7 @@ class AdminPresenter extends BasePresenter {
         fullName: fullName,
         email: email,
         crm: crm,
+        blocked: false
       );
 
       await adminmRepository.registerDoctor(doctor, password);

@@ -11,8 +11,7 @@ void main() async {
 
   final moduleManager = await setup();
 
-    setUrlStrategy(PathUrlStrategy()); // <- precisa do flutter_web_plugins
-
+  setUrlStrategy(PathUrlStrategy());
 
   runApp(FormularioPacienteApp(moduleManager: moduleManager));
 }
@@ -22,4 +21,3 @@ Future<ModuleManagerInterface> setup() async {
   await moduleManager.registerModules([AppModule()]);
   return moduleManager;
 }
-
