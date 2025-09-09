@@ -1,0 +1,1 @@
+export './secretary_entity.dart';

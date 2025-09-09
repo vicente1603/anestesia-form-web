@@ -4,11 +4,14 @@ Widget buildYesNoField({
   required String label,
   required String? groupValue,
   required void Function(String?) onChanged,
+  String? textValue,
+  void Function(String)? onTextChanged,
+  String? textLabel,
 }) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: TextStyle(fontSize: 16)),
+      Text(label, style: const TextStyle(fontSize: 16)),
       const SizedBox(height: 12),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -57,6 +60,23 @@ Widget buildYesNoField({
           ],
         ),
       ),
+      // Se o usuário marcar "Sim", mostra o campo extra
+      if (groupValue == "Sim") ...[
+        const SizedBox(height: 12),
+        TextFormField(
+          initialValue: textValue,
+          decoration: InputDecoration(
+            labelText: textLabel ?? "Descreva",
+          ),
+          onChanged: onTextChanged,
+          validator: (value) {
+            if (groupValue == "Sim" && (value == null || value.isEmpty)) {
+              return 'Por favor, descreva';
+            }
+            return null;
+          },
+        ),
+      ],
       const SizedBox(height: 16),
     ],
   );

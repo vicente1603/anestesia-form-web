@@ -92,18 +92,25 @@ class _FormFieldsState extends State<FormFields> {
                         .copyWith(smokes: v),
               ),
         ),
+
         buildYesNoField(
           label: 'Usa alguma droga?',
           groupValue: widget.presenter.formDataEntity.drugs,
           onChanged:
-              (v) => setState(
-                () =>
-                    widget.presenter.formDataEntity = widget
-                        .presenter
-                        .formDataEntity
-                        .copyWith(drugs: v),
-              ),
+              (v) => setState(() {
+                widget.presenter.formDataEntity = widget
+                    .presenter
+                    .formDataEntity
+                    .copyWith(drugs: v);
+              }),
+          textValue: widget.presenter.formDataEntity.drugsDetail,
+          onTextChanged: (v) {
+            widget.presenter.formDataEntity = widget.presenter.formDataEntity
+                .copyWith(drugsDetail: v);
+          },
+          textLabel: "Qual(is)?",
         ),
+
         buildYesNoField(
           label: 'Já esteve internado em UTI?',
           groupValue: widget.presenter.formDataEntity.icuHistory,

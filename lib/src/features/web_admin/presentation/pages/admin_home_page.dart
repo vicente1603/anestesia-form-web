@@ -62,6 +62,14 @@ class _AdminHomePageState extends State<AdminHomePage> {
                 ),
               ),
             ),
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.blueGrey),
+              tooltip: 'Sair',
+              onPressed: () async {
+                await widget.presenter.signOut();
+                Navigator.pushReplacementNamed(context, '/admin-login');
+              },
+            ),
           ],
         ),
       ),

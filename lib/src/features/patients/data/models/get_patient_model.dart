@@ -1,0 +1,39 @@
+import '../../../features.dart';
+
+class GetPatientModel extends PatientEntity {
+  GetPatientModel({
+    required super.id,
+    required super.fullName,
+    required super.email,
+    required super.doctorId,
+    required super.cpf,
+    required super.phone,
+    required super.birthDate,
+    required super.token,
+  });
+
+  factory GetPatientModel.fromMap(String id, Map<String, dynamic> map) {
+    return GetPatientModel(
+      id: id,
+      fullName: map['full_name'],
+      email: map['email'],
+      doctorId: map['doctorId'],
+      cpf: map['cpf'],
+      phone: map['phone'],
+      birthDate: map['birthDate'].toDate(),
+      token: map['token'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': fullName,
+      'full_name': email,
+      'doctorId': doctorId,
+      'cpf': cpf,
+      'phone': phone,
+      'birthDate': birthDate,
+      'token': token,
+    };
+  }
+}

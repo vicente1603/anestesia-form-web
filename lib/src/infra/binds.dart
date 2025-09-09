@@ -12,6 +12,48 @@ abstract class AppBinds {
     i.registerFactory<AdminRepository>(
       AdminRepositoryImpl(FirebaseAuth.instance, FirebaseFirestore.instance),
     );
+
+    i.registerFactory<AuthRepository>(
+      FirebaseAuthRepository(FirebaseAuth.instance, FirebaseFirestore.instance),
+    );
+
+    i.registerFactory<SecretariesRepository>(
+      SecretariesRepositoryImpl(FirebaseFirestore.instance, i.get()),
+    );
+
+    i.registerFactory<DoctorRepository>(
+      DoctorRepositoryImpl(FirebaseFirestore.instance),
+    );
+
+    i.registerFactory<PatientsRepository>(
+      PatientsRepositoryImpl(FirebaseFirestore.instance),
+    );
+
+    i.registerFactory<LoginPresenter>(LoginPresenter(authRepository: i.get()));
+
+    i.registerFactory<SecretariesPresenter>(
+      SecretariesPresenter(
+        authRepository: i.get(),
+        secretariesRepository: i.get(),
+      ),
+    );
+
+    i.registerFactory<DoctorPresenter>(
+      DoctorPresenter(
+        doctorRepository: i.get(),
+        secretariesRepository: i.get(),
+        authRepository: i.get(),
+      ),
+    );
+
+    i.registerFactory<PatientsPresenter>(
+      PatientsPresenter(
+        doctorRepository: i.get(),
+        secretariesRepository: i.get(),
+        authRepository: i.get(),
+        patientsRepository: i.get(),
+      ),
+    );
   }
 
   static void _presenters(Injector i) {

@@ -22,16 +22,16 @@ class AdminPresenter extends BasePresenter {
     doctors = ValueNotifier([]);
   }
 
-  Future<void> login(String email, String password) async {
-    state.value = UILoadingState();
+  // Future<void> login(String email, String password) async {
+  //   state.value = UILoadingState();
 
-    try {
-      user = await adminmRepository.signInWithEmail(email, password);
-      state.value = UISuccessState('');
-    } catch (e) {
-      state.value = UIErrorState(e.toString());
-    }
-  }
+  //   try {
+  //     user = await adminmRepository.signInWithEmail(email, password);
+  //     state.value = UISuccessState('');
+  //   } catch (e) {
+  //     state.value = UIErrorState(e.toString());
+  //   }
+  // }
 
   Future<void> signOut() async {
     await adminmRepository.signOut();

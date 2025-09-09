@@ -6,6 +6,7 @@ class FormDataEntity {
   final String? medications;
   final String? smokes;
   final String? drugs;
+  final String? drugsDetail;
   final String? icuHistory;
   final String? disabilities;
   final String? previousSurgeries;
@@ -20,6 +21,7 @@ class FormDataEntity {
     this.medications,
     this.smokes,
     this.drugs,
+    this.drugsDetail,
     this.icuHistory,
     this.disabilities,
     this.previousSurgeries,
@@ -31,6 +33,7 @@ class FormDataEntity {
     String? surgery,
     String? surgeon,
     String? allergies,
+    String? drugsDetail,
     String? diseases,
     String? medications,
     String? smokes,
@@ -49,6 +52,7 @@ class FormDataEntity {
       medications: medications ?? this.medications,
       smokes: smokes ?? this.smokes,
       drugs: drugs ?? this.drugs,
+      drugsDetail: drugsDetail ?? this.drugsDetail,
       icuHistory: icuHistory ?? this.icuHistory,
       disabilities: disabilities ?? this.disabilities,
       previousSurgeries: previousSurgeries ?? this.previousSurgeries,
