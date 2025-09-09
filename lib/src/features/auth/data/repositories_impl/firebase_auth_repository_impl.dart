@@ -18,27 +18,28 @@ class FirebaseAuthRepository implements AuthRepository {
 
       final uid = credential.user!.uid;
 
-      final doc = await _firestore
-          .collection('users')
-          .doc(uid)
-          .get(const GetOptions(source: Source.server));
+      final userRef = _firestore.collection('users').doc(uid);
+      final doc = await userRef.get(const GetOptions(source: Source.server));
 
       if (!doc.exists) {
-        await _firebaseAuth.signOut();
-        throw UserNotFoundException();
+        await userRef.set({
+          'uid': uid,
+          'email': email,
+          'name': password,
+          'role': 'admin',
+          'createdAt': FieldValue.serverTimestamp(),
+          'blocked': false,
+        });
       }
 
       final data = doc.data()!;
-      final blocked = data['blocked'] as bool? ?? false;
-      if (blocked) {
-        await _firebaseAuth.signOut();
-        throw BlockedUserException();
-      }
 
       return FirebaseUser.fromMap(data);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'wrong-password') throw WrongPasswordException();
       if (e.code == 'user-not-found') throw UserNotFoundException();
+      if (e.code == 'user-disabled') throw UserDisabledException();
+
       rethrow;
     } catch (e) {
       if (_firebaseAuth.currentUser != null) {
@@ -76,28 +77,6 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<bool?> getBlocked(String uid) async {
-    try {
-      final doc = await _firestore
-          .collection('users')
-          .doc(uid)
-          .get(const GetOptions(source: Source.server));
-
-      if (!doc.exists) return null;
-
-      final data = doc.data();
-      return data?['blocked'] as bool?;
-    } catch (e) {
-      final cached = await _firestore
-          .collection('users')
-          .doc(uid)
-          .get(const GetOptions(source: Source.cache));
-      if (!cached.exists) return null;
-      return cached.data()?['blocked'] as bool?;
-    }
-  }
-
-  @override
   Future<void> resetPassword(String email) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
@@ -109,8 +88,5 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> blockedUser(String uid) async {
-    final userRef = _firestore.collection('users').doc(uid);
-    await userRef.update({'blocked': true});
-  }
+  Future<void> blockUser(String uid) async {}
 }

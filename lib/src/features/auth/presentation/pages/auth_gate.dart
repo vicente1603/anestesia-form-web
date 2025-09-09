@@ -12,9 +12,6 @@ class AuthGate extends StatelessWidget {
   const AuthGate({super.key, required this.loginPresenter});
 
   Future<_AuthResult> _checkUserData(User user) async {
-    final blocked = await loginPresenter.getBlocked(user.uid);
-    if (blocked == true) return _AuthResult(blocked: true);
-
     final role = await loginPresenter.getRole(user.uid);
     return _AuthResult(role: role);
   }
@@ -51,14 +48,6 @@ class AuthGate extends StatelessWidget {
               return const _ErrorScreen(error: 'Erro desconhecido');
             }
 
-            if (result.blocked) {
-              auth.signOut();
-              return LoginPage(
-                presenter: DM.get(),
-                errorMessage: 'Usuário não existe',
-              );
-            }
-
             switch (result.role) {
               case 'doctor':
                 return DoctorPage(
@@ -88,9 +77,8 @@ class AuthGate extends StatelessWidget {
 }
 
 class _AuthResult {
-  final bool blocked;
   final String? role;
-  _AuthResult({this.blocked = false, this.role});
+  _AuthResult({this.role});
 }
 
 class _LoadingScreen extends StatelessWidget {

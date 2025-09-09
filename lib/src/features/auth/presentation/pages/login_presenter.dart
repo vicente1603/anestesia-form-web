@@ -66,15 +66,6 @@ class LoginPresenter extends BasePresenter {
     }
   }
 
-  Future<bool?> getBlocked(String uid) async {
-    try {
-      return await authRepository.getBlocked(uid);
-    } catch (e) {
-      state.value = UIErrorState(e.toString());
-      return null;
-    }
-  }
-
   Future<void> resetPassword(String email) async {
     try {
       await authRepository.resetPassword(email);

@@ -1,4 +1,3 @@
-
 import '../../data/models/firebase_user_model.dart';
 
 abstract class AuthRepository {
@@ -7,7 +6,5 @@ abstract class AuthRepository {
   Future<String> getCurrentUserId();
   Future<String?> getUserRole(String uid);
   Future<void> resetPassword(String email);
-  Future<void> blockedUser(String uid);
-  Future<bool?> getBlocked(String uid);
-
+  Future<void> blockUser(String uid);
 }

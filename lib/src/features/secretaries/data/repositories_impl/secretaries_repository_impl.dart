@@ -77,6 +77,6 @@ class SecretariesRepositoryImpl implements SecretariesRepository {
     final docRef = _firestore.collection('users').doc(secretary.uid);
 
     await docRef.delete();
-    _authRepository.blockedUser(secretary.uid);
+    // _authRepository.blockedUser(secretary.uid);
   }
 }

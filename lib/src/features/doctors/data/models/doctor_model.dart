@@ -9,7 +9,6 @@ class DoctorModel extends DoctorEntity {
     required super.email,
     required super.crm,
     super.createdAt,
-    super.blocked,
   });
 
   factory DoctorModel.fromMap(String id, Map<String, dynamic> map) {
@@ -19,7 +18,6 @@ class DoctorModel extends DoctorEntity {
       email: map['email'] ?? '',
       crm: map['crm'] ?? '',
       createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
-      blocked: map['blocked'] ?? false,
     );
   }
 
@@ -31,7 +29,6 @@ class DoctorModel extends DoctorEntity {
       'crm': crm,
       'role': 'doctor',
       'createdAt': createdAt,
-      'blocked': blocked,
     };
   }
 }

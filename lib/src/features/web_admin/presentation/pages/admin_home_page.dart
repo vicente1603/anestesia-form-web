@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 import '../../../features.dart';
 
 class AdminHomePage extends StatefulWidget {
-  final AdminPresenter presenter;
+  final AdminPresenter adminPresenter;
+  final LoginPresenter loginPresenter;
 
-  const AdminHomePage({super.key, required this.presenter});
+  const AdminHomePage({
+    super.key,
+    required this.adminPresenter,
+    required this.loginPresenter,
+  });
 
   @override
   State<AdminHomePage> createState() => _AdminHomePageState();
@@ -15,9 +20,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
   @override
   void initState() {
     super.initState();
-    widget.presenter.init();
+    widget.adminPresenter.init();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.presenter.getDoctors();
+      widget.adminPresenter.getDoctors();
     });
   }
 
@@ -46,7 +51,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
                 if (shouldRefresh == true) {
                   setState(() {
-                    widget.presenter.getDoctors();
+                    widget.adminPresenter.getDoctors();
                   });
                 }
               },
@@ -66,7 +71,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
               icon: const Icon(Icons.logout, color: Colors.blueGrey),
               tooltip: 'Sair',
               onPressed: () async {
-                await widget.presenter.signOut();
+                await widget.loginPresenter.signOut();
                 Navigator.pushReplacementNamed(context, '/admin-login');
               },
             ),
@@ -82,14 +87,14 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
             Expanded(
               child: ValueListenableBuilder(
-                valueListenable: widget.presenter.state,
+                valueListenable: widget.adminPresenter.state,
                 builder: (context, state, _) {
                   if (state is UILoadingState) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
                   return ValueListenableBuilder<List<DoctorEntity>>(
-                    valueListenable: widget.presenter.doctors,
+                    valueListenable: widget.adminPresenter.doctors,
                     builder: (context, doctors, _) {
                       if (doctors.isEmpty) {
                         return const Center(
@@ -128,13 +133,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                                       DataCell(Text(doctor.fullName)),
                                       DataCell(Text(doctor.crm)),
                                       DataCell(Text(doctor.email)),
-                                      DataCell(
-                                        Text(
-                                          doctor.blocked ?? false
-                                              ? 'Não'
-                                              : 'Sim',
-                                        ),
-                                      ),
+                                      DataCell(Text('Sim')),
                                       DataCell(
                                         IconButton(
                                           icon: const Icon(
@@ -218,9 +217,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
                                             );
 
                                             if (confirmed == true) {
-                                              widget.presenter.deleteDoctor(
-                                                doctor,
-                                              );
+                                              widget.adminPresenter
+                                                  .deleteDoctor(doctor);
 
                                               if (context.mounted) {
                                                 Navigator.pop(context, true);

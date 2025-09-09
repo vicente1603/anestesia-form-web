@@ -18,3 +18,10 @@ class WrongPasswordException implements Exception {
   @override
   String toString() => message;
 }
+
+class UserDisabledException implements Exception {
+  final String message;
+  UserDisabledException([this.message = 'Usuário desabilitado']);
+  @override
+  String toString() => message;
+}
