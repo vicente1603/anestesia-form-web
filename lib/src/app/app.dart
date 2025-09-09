@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../features/features.dart';
 import '../infra/infra.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class FormularioPacienteApp extends StatelessWidget {
   final ModuleManagerInterface moduleManager;
@@ -14,10 +14,19 @@ class FormularioPacienteApp extends StatelessWidget {
 
     final app = MaterialApp(
       title: 'Formulário Pré-Anestésico',
-      home: PatientFormPage(presenter: DM.get()),
+      navigatorKey: navigatorKey,
+      initialRoute: '/login',
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      locale: const Locale('pt', 'BR'),
+      supportedLocales: const [Locale('pt', 'BR')],
       theme: appTheme,
-      routes: moduleManager.routes ?? {},
+      onGenerateRoute:
+          (settings) => AppRouter.onGenerateRoute(settings, moduleManager),
     );
 
     if (providers.isNotEmpty) {

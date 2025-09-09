@@ -5,8 +5,9 @@ import '../../../features.dart';
 import 'package:intl/intl.dart';
 class PatientFormPage extends StatefulWidget {
   final PatientFormPresenter presenter;
+  final String token;
 
-  const PatientFormPage({super.key, required this.presenter});
+  const PatientFormPage({super.key, required this.presenter, required this.token});
 
   @override
   State<PatientFormPage> createState() => _PatientFormPageState();
