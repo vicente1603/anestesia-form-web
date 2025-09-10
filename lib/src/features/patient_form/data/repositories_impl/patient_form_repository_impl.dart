@@ -99,40 +99,48 @@ class PatientFormRepositoryImpl implements PatientFormRepository {
       final dynamicData = {
         "surgery": formDataEntity.surgery,
         "surgeon": formDataEntity.surgeon,
-        "allergies": formDataEntity.allergies,
-        "diseases": formDataEntity.diseases,
-        "medications": formDataEntity.medications,
+        "hospital": formDataEntity.hospital,
+        "gender": formDataEntity.gender,
+        "weight": formDataEntity.weight,
+        "height": formDataEntity.height,
+        "hasAllergies": formDataEntity.hasAllergies,
+        "allergiesDetail": formDataEntity.allergiesDetail,
+        "hasDiseases": formDataEntity.hasDiseases,
+        "diseasesDetail": formDataEntity.diseasesDetail,
+        "usesMedication": formDataEntity.usesMedication,
+        "medicationsDetail": formDataEntity.medicationsDetail,
         "smokes": formDataEntity.smokes,
-        "drugs": formDataEntity.drugs,
-        "icu_history": formDataEntity.icuHistory,
+        "usesDrugs": formDataEntity.usesDrugs,
+        "drugsDetail": formDataEntity.drugsDetail,
+        "icuHistory": formDataEntity.icuHistory,
+        "icuHistoryDetail": formDataEntity.icuHistoryDetail,
         "disabilities": formDataEntity.disabilities,
-        "previous_surgeries": formDataEntity.previousSurgeries,
+        "disabilitiesDetail": formDataEntity.disabilitiesDetail,
+        "hasPreviousSurgeries": formDataEntity.hasPreviousSurgeries,
+        "previousSurgeriesDetail": formDataEntity.previousSurgeriesDetail,
         "postOpComplications": formDataEntity.postOpComplications,
-        "previous_anesthesia": formDataEntity.familyAnesthesiaHistory,
-        "age": "32",
-        "weight": "110",
-        "height": "1.54",
-        "imc": "46.4",
-        "gender": "Feminino",
+        "familyAnesthesiaHistory": formDataEntity.familyAnesthesiaHistory,
       };
 
       dynamicData.forEach((key, value) {
-        formData.fields.add(MapEntry('data[$key]', value!));
+        if (value != null) {
+          formData.fields.add(MapEntry('data[$key]', value.toString()));
+        }
       });
 
-      if (arquivoSelecionado != null) {
-        final reader = html.FileReader();
-        reader.readAsArrayBuffer(arquivoSelecionado);
-        await reader.onLoad.first;
-        final bytes = reader.result as Uint8List;
+      // if (arquivoSelecionado != null) {
+      //   final reader = html.FileReader();
+      //   reader.readAsArrayBuffer(arquivoSelecionado);
+      //   await reader.onLoad.first;
+      //   final bytes = reader.result as Uint8List;
 
-        final multipartFile = MultipartFile.fromBytes(
-          bytes,
-          filename: arquivoSelecionado.name,
-          contentType: MediaType.parse(arquivoSelecionado.type),
-        );
-        formData.files.add(MapEntry('fileUrl', multipartFile));
-      }
+      //   final multipartFile = MultipartFile.fromBytes(
+      //     bytes,
+      //     filename: arquivoSelecionado.name,
+      //     contentType: MediaType.parse(arquivoSelecionado.type),
+      //   );
+      //   formData.files.add(MapEntry('fileUrl', multipartFile));
+      // }
 
       await dio.post('http://localhost:3000/v1/analysis', data: formData);
 

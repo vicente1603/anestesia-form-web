@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-
 import '../../../../common/common.dart';
 import '../../../features.dart';
 import 'dart:html' as html;

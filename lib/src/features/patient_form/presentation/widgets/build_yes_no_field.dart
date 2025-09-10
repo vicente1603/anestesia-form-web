@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 Widget buildYesNoField({
   required String label,
-  required String? groupValue,
-  required void Function(String?) onChanged,
+  required bool? groupValue,
+  required void Function(bool?) onChanged,
   String? textValue,
   void Function(String)? onTextChanged,
   String? textLabel,
@@ -23,12 +23,12 @@ Widget buildYesNoField({
           children: [
             Expanded(
               child: InkWell(
-                onTap: () => onChanged("Sim"),
+                onTap: () => onChanged(true),
                 borderRadius: BorderRadius.circular(8),
                 child: Row(
                   children: [
-                    Radio<String>(
-                      value: "Sim",
+                    Radio<bool>(
+                      value: true,
                       groupValue: groupValue,
                       onChanged: onChanged,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -41,12 +41,12 @@ Widget buildYesNoField({
             ),
             Expanded(
               child: InkWell(
-                onTap: () => onChanged("Não"),
+                onTap: () => onChanged(false),
                 borderRadius: BorderRadius.circular(8),
                 child: Row(
                   children: [
-                    Radio<String>(
-                      value: "Não",
+                    Radio<bool>(
+                      value: false,
                       groupValue: groupValue,
                       onChanged: onChanged,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -61,16 +61,14 @@ Widget buildYesNoField({
         ),
       ),
       // Se o usuário marcar "Sim", mostra o campo extra
-      if (groupValue == "Sim") ...[
+      if (groupValue == true && textLabel != null) ...[
         const SizedBox(height: 12),
         TextFormField(
           initialValue: textValue,
-          decoration: InputDecoration(
-            labelText: textLabel ?? "Descreva",
-          ),
+          decoration: InputDecoration(labelText: textLabel),
           onChanged: onTextChanged,
           validator: (value) {
-            if (groupValue == "Sim" && (value == null || value.isEmpty)) {
+            if (groupValue == true && (value == null || value.isEmpty)) {
               return 'Por favor, descreva';
             }
             return null;

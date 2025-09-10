@@ -1,13 +1,21 @@
 import 'dart:html' as html;
+import 'dart:io';
 import 'package:anestesia_web/src/common/ui_state.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../features.dart';
 import 'package:intl/intl.dart';
+
 class PatientFormPage extends StatefulWidget {
   final PatientFormPresenter presenter;
   final String token;
 
-  const PatientFormPage({super.key, required this.presenter, required this.token});
+  const PatientFormPage({
+    super.key,
+    required this.presenter,
+    required this.token,
+  });
 
   @override
   State<PatientFormPage> createState() => _PatientFormPageState();
@@ -16,8 +24,8 @@ class PatientFormPage extends StatefulWidget {
 class _PatientFormPageState extends State<PatientFormPage> {
   final formKey = GlobalKey<FormState>();
   final model = FormDataModel();
-   String patientName = '';
-   String patientBirthDate = '';
+  String patientName = '';
+  String patientBirthDate = '';
 
   html.File? arquivoSelecionado;
 
@@ -34,21 +42,57 @@ class _PatientFormPageState extends State<PatientFormPage> {
 
     setState(() {
       patientName = widget.presenter.infoEntity.fullName ?? '';
-      patientBirthDate = DateFormat('dd/MM/yyyy').format(widget.presenter.infoEntity.birthDate!);
+      patientBirthDate = DateFormat(
+        'dd/MM/yyyy',
+      ).format(widget.presenter.infoEntity.birthDate!);
     });
   }
 
-  void _selectFile() {
-    final uploadInput =
-        html.FileUploadInputElement()..accept = 'image/*,application/pdf';
-    uploadInput.click();
-
-    uploadInput.onChange.listen((e) {
-      final file = uploadInput.files?.first;
-      if (file != null) {
-        setState(() => arquivoSelecionado = file);
-      }
-    });
+  Future<void> _pickFileOrImage() async {
+    // showModalBottomSheet(
+    //   context: context,
+    //   builder:
+    //       (ctx) => SafeArea(
+    //         child: Column(
+    //           mainAxisSize: MainAxisSize.min,
+    //           children: [
+    //             ListTile(
+    //               leading: const Icon(Icons.upload_file),
+    //               title: const Text('Selecionar arquivo'),
+    //               onTap: () async {
+    //                 Navigator.pop(ctx);
+    //                 final result = await FilePicker.platform.pickFiles(
+    //                   type: FileType.any,
+    //                 );
+    //                 if (result != null && result.files.isNotEmpty) {
+    //                   final path = result.files.first.path;
+    //                   if (path != null) {
+    //                     setState(() {
+    //                       arquivoSelecionado = File(path);
+    //                     });
+    //                   }
+    //                 }
+    //               },
+    //             ),
+    //             ListTile(
+    //               leading: const Icon(Icons.camera_alt),
+    //               title: const Text('Tirar foto'),
+    //               onTap: () async {
+    //                 Navigator.pop(ctx);
+    //                 final image = await ImagePicker().pickImage(
+    //                   source: ImageSource.camera,
+    //                 );
+    //                 if (image != null) {
+    //                   setState(() {
+    //                     arquivoSelecionado = File(image.path);
+    //                   });
+    //                 }
+    //               },
+    //             ),
+    //           ],
+    //         ),
+    //       ),
+    // );
   }
 
   @override
@@ -151,12 +195,12 @@ class _PatientFormPageState extends State<PatientFormPage> {
                                     SizedBox(
                                       width: double.infinity,
                                       child: OutlinedButton.icon(
-                                        onPressed: _selectFile,
+                                        onPressed: _pickFileOrImage,
                                         icon: const Icon(Icons.upload_file),
                                         label: Text(
                                           arquivoSelecionado == null
-                                              ? 'Selecionar arquivo (exames, laudos...)'
-                                              : 'Arquivo: ${arquivoSelecionado!.name}',
+                                              ? 'Selecionar arquivo ou tirar foto'
+                                              : 'Arquivo: ${arquivoSelecionado!}',
                                         ),
                                         style: OutlinedButton.styleFrom(
                                           padding: const EdgeInsets.symmetric(
@@ -170,6 +214,7 @@ class _PatientFormPageState extends State<PatientFormPage> {
                                         ),
                                       ),
                                     ),
+
                                     const SizedBox(height: 24),
                                     SizedBox(
                                       width: double.infinity,
