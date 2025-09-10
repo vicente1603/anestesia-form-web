@@ -10,7 +10,7 @@ abstract class AppBinds {
     i.registerFactory<PatientFormRepository>(PatientFormRepositoryImpl());
 
     i.registerFactory<AdminRepository>(
-      AdminRepositoryImpl(FirebaseAuth.instance, FirebaseFirestore.instance),
+      AdminRepositoryImpl(FirebaseFirestore.instance),
     );
 
     i.registerFactory<AuthRepository>(
@@ -18,7 +18,7 @@ abstract class AppBinds {
     );
 
     i.registerFactory<SecretariesRepository>(
-      SecretariesRepositoryImpl(FirebaseFirestore.instance, i.get()),
+      SecretariesRepositoryImpl(FirebaseFirestore.instance),
     );
 
     i.registerFactory<DoctorRepository>(

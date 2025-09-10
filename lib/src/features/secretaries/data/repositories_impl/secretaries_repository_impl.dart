@@ -5,9 +5,8 @@ import '../../../features.dart';
 
 class SecretariesRepositoryImpl implements SecretariesRepository {
   final FirebaseFirestore _firestore;
-  final AuthRepository _authRepository;
 
-  SecretariesRepositoryImpl(this._firestore, this._authRepository);
+  SecretariesRepositoryImpl(this._firestore);
 
   @override
   Future<List<SecretaryEntity>> getSecretariesByDoctor(String doctorId) async {

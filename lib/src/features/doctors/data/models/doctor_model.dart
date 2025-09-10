@@ -11,9 +11,30 @@ class DoctorModel extends DoctorEntity {
     super.createdAt,
   });
 
-  factory DoctorModel.fromMap(String id, Map<String, dynamic> map) {
+  static DateTime? mapToDateTime(Map<String, dynamic>? map) {
+    if (map == null) return null;
+    final seconds = map['_seconds'] as int?;
+    final nanoseconds = map['_nanoseconds'] as int? ?? 0;
+    if (seconds == null) return null;
+
+    return DateTime.fromMillisecondsSinceEpoch(
+      seconds * 1000 + nanoseconds ~/ 1000000,
+    );
+  }
+
+  factory DoctorModel.fromMap(Map<String, dynamic> map) {
     return DoctorModel(
-      uid: id,
+      uid: map['id'] ?? '',
+      fullName: map['name'] ?? '',
+      email: map['email'] ?? '',
+      crm: map['crm'] ?? '',
+      createdAt: mapToDateTime(map['createdAt'] as Map<String, dynamic>?),
+    );
+  }
+
+  factory DoctorModel.fromFirebaseMap(Map<String, dynamic> map) {
+    return DoctorModel(
+      uid: map['uid'] ?? '',
       fullName: map['name'] ?? '',
       email: map['email'] ?? '',
       crm: map['crm'] ?? '',

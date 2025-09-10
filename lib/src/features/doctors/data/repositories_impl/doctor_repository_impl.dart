@@ -17,7 +17,7 @@ class DoctorRepositoryImpl implements DoctorRepository {
 
   if (query.docs.isNotEmpty) {
     final doc = query.docs.first;
-    return DoctorModel.fromMap(doc.id, doc.data());
+    return DoctorModel.fromFirebaseMap(doc.data());
   }
 
   return null;        

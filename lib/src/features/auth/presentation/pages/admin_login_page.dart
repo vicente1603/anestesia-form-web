@@ -122,7 +122,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                     if (user.role == 'admin') {
                                       Navigator.pushReplacementNamed(
                                         context,
-                                        '/home-admin',
+                                        '/admin-home',
                                       );
                                     }
                                   }

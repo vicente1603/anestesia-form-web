@@ -1,26 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../../features.dart';
 
 class AdminRepositoryImpl implements AdminRepository {
-  final FirebaseAuth _firebaseAuth;
   final FirebaseFirestore _firestore;
 
-  AdminRepositoryImpl(this._firebaseAuth, this._firestore);
+  AdminRepositoryImpl(this._firestore);
 
   @override
   Future<List<DoctorEntity>> getDoctors() async {
-    final query =
-        await _firestore
-            .collection('users')
-            .where('role', isEqualTo: 'doctor')
-            .get();
+    final dio = Dio();
 
-    return query.docs
-        .map((doc) => DoctorModel.fromMap(doc.id, doc.data()))
-        .toList();
+    final result = await dio.get('http://localhost:3000/v1/doctor');
+
+    return (result.data as List).map((e) => DoctorModel.fromMap(e)).toList();
   }
 
   @override
@@ -41,8 +35,6 @@ class AdminRepositoryImpl implements AdminRepository {
     } on DioException catch (e) {
       if (e.response != null) {
         debugPrint("ERRO DO SERVIDOR: ${e.response?.data}");
-        final message =
-            e.response?.data?['message'] ?? 'Ocorreu um erro desconhecido.';
       }
     } catch (e) {
       debugPrint("ERRO INESPERADO: $e");
@@ -51,8 +43,12 @@ class AdminRepositoryImpl implements AdminRepository {
 
   @override
   Future<void> deleteDoctor(DoctorEntity doctor) async {
-    final docRef = _firestore.collection('users').doc(doctor.uid);
+    try {
+      final dio = Dio();
 
-    await docRef.delete();
+      await dio.delete('http://localhost:3000/v1/doctor/${doctor.uid}');
+    } catch (e) {
+      print(e);
+    }
   }
 }
