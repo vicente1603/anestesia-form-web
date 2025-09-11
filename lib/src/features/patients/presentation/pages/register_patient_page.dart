@@ -22,6 +22,7 @@ class _RegisterPacientPageState extends State<RegisterPatientPage> {
   final cpfController = TextEditingController();
   final birthDateController = TextEditingController();
   final phoneController = TextEditingController();
+  final medicalInsuranceController = TextEditingController();
 
   final cpfMaskFormatter = MaskTextInputFormatter(
     mask: '###.###.###-##',
@@ -33,12 +34,20 @@ class _RegisterPacientPageState extends State<RegisterPatientPage> {
   );
 
   @override
+  void initState() {
+    widget.patientsPresenter.init();
+    super.initState();
+  }
+
+  @override
   void dispose() {
     nameController.dispose();
     emailController.dispose();
     cpfController.dispose();
     birthDateController.dispose();
     phoneController.dispose();
+    medicalInsuranceController.dispose();
+
     super.dispose();
   }
 
@@ -102,6 +111,20 @@ class _RegisterPacientPageState extends State<RegisterPatientPage> {
                   }
                   if (!CPFValidator.isValid(unmaskedCpf)) {
                     return 'CPF inválido';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: medicalInsuranceController,
+                decoration: const InputDecoration(
+                  labelText: 'Convênio Médico',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'O convênio é obrigatório';
                   }
                   return null;
                 },
@@ -173,6 +196,7 @@ class _RegisterPacientPageState extends State<RegisterPatientPage> {
                       cpf: cpfMaskFormatter.getUnmaskedText(),
                       birthDate: birthDate,
                       phone: phoneController.text,
+                      medicalInsurance: medicalInsuranceController.text,
                     );
 
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -185,6 +209,7 @@ class _RegisterPacientPageState extends State<RegisterPatientPage> {
                     cpfController.clear();
                     birthDateController.clear();
                     phoneController.clear();
+                    medicalInsuranceController.clear();
 
                     Navigator.of(context).pop(true);
                   }

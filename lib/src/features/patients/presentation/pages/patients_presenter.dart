@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
-
+import 'package:flutter/services.dart';
 import '../../../../common/common.dart';
 import '../../../features.dart';
+import 'dart:html' as html;
 
 class PatientsPresenter extends BasePresenter {
   final PatientsRepository doctorRepository;
@@ -67,6 +67,7 @@ class PatientsPresenter extends BasePresenter {
     required String cpf,
     required DateTime birthDate,
     required String phone,
+    required String medicalInsurance,
   }) async {
     state.value = UILoadingState();
 
@@ -74,10 +75,7 @@ class PatientsPresenter extends BasePresenter {
     String doctorId = '';
 
     final docSnapshot =
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .get();
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
     if (docSnapshot.exists) {
       doctorId = docSnapshot.data()?['associatedDoctorId'];
@@ -97,6 +95,7 @@ class PatientsPresenter extends BasePresenter {
         cpf: cpf,
         birthDate: birthDate,
         phone: phone,
+        medicalInsurance: medicalInsurance,
       );
 
       await patientsRepository.registerPatient(patient);
@@ -110,10 +109,26 @@ class PatientsPresenter extends BasePresenter {
     }
   }
 
-  Future<void> sendLink(String token) async {
-    SharePlus.instance.share(
-      ShareParams(text: 'https://anestesia-app-bdf0d.web.app?token=$token'),
-    );
+  Future<void> sendLink(BuildContext context, String token) async {
+    final link = 'https://anestesia-app-bdf0d.web.app?token=$token';
+
+    try {
+      await Clipboard.setData(ClipboardData(text: link));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Link copiado para a área de transferência'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Não foi possível copiar. Abra manualmente: $link'),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
   }
 
   Future<void> deletePatient(PatientEntity patient) async {

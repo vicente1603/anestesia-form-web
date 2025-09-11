@@ -16,6 +16,7 @@ class PatientModel extends PatientEntity {
     required super.cpf,
     required super.phone,
     required super.birthDate,
+    required super.medicalInsurance,
   });
 
   Map<String, dynamic> toMap() => {
@@ -30,6 +31,8 @@ class PatientModel extends PatientEntity {
     'cpf': cpf,
     'phone': phone,
     'birthDate': birthDate,
+    'medicalInsurance': medicalInsurance,
+    'form': form,
   };
 
   factory PatientModel.fromMap(String id, Map<String, dynamic> map) {
@@ -46,6 +49,7 @@ class PatientModel extends PatientEntity {
       cpf: map['cpf'],
       phone: map['phone'],
       birthDate: map['birthDate'],
+      medicalInsurance: map['medicalInsurance'],
     );
   }
 }

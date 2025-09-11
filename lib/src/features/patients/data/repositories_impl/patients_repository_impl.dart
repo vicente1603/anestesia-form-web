@@ -36,6 +36,7 @@ class PatientsRepositoryImpl implements PatientsRepository {
       cpf: patient.cpf,
       phone: patient.phone,
       birthDate: patient.birthDate,
+      medicalInsurance: patient.medicalInsurance,
     );
 
     await docRef.set(patientModel.toMap());

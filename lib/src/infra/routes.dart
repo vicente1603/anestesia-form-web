@@ -31,7 +31,11 @@ abstract class Routes {
         (context) => RegisterPatientPage(patientsPresenter: i.get()),
     '/patient-detail': (context) {
       final arguments =
-          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+      if (arguments == null) {
+        return const NotFoundPage();
+      }
 
       return PatientDetailPage(
         patient: arguments['patient'] as GetPatientModel,

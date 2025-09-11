@@ -1,3 +1,5 @@
+import 'package:anestesia_web/src/features/features.dart';
+
 class PatientEntity {
   final String id;
   final String fullName;
@@ -11,6 +13,8 @@ class PatientEntity {
   final String? token;
   final DateTime? formSentAt;
   final DateTime? createdAt;
+  final String medicalInsurance;
+  final FormDataEntity? form;
 
   const PatientEntity({
     required this.id,
@@ -25,5 +29,7 @@ class PatientEntity {
     this.token,
     this.formSentAt,
     this.createdAt,
+    required this.medicalInsurance,
+    this.form,
   });
 }
