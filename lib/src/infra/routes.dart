@@ -39,7 +39,8 @@ abstract class Routes {
 
       return PatientDetailPage(
         patient: arguments['patient'] as GetPatientModel,
-        presenter: i.get(),
+        patientsPresenter: i.get(),
+        patientFormPresenter: i.get(),
       );
     },
     '/secretary-detail': (context) {

@@ -13,7 +13,6 @@ class GetPatientModel extends PatientEntity {
     required super.medicalInsurance,
     required super.form,
     required super.formStatus,
-
   });
 
   factory GetPatientModel.fromMap(String id, Map<String, dynamic> map) {
@@ -27,7 +26,7 @@ class GetPatientModel extends PatientEntity {
       birthDate: map['birthDate'].toDate(),
       token: map['token'],
       medicalInsurance: map['medicalInsurance'],
-      form: map['forms'] != null ? FormDataModel.fromMap(map['forms']): null,
+      form: map['forms'] != null ? FormDataModel.fromMap(map['forms']) : null,
       formStatus: map['formStatus'],
     );
   }

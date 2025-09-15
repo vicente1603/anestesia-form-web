@@ -1,9 +1,6 @@
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http_parser/http_parser.dart';
 import '../../../features.dart';
 import 'dart:html' as html;
 
@@ -141,6 +138,71 @@ class PatientFormRepositoryImpl implements PatientFormRepository {
       //   );
       //   formData.files.add(MapEntry('fileUrl', multipartFile));
       // }
+
+      await dio.post('http://localhost:3000/v1/analysis', data: formData);
+
+      return FormSuccess();
+    } on DioException catch (e) {
+      if (e.response != null) {
+        debugPrint("ERRO DO SERVIDOR: ${e.response?.data}");
+        final message =
+            e.response?.data?['message'] ?? 'Ocorreu um erro desconhecido.';
+        return FormFailure('Falha na API: $message');
+      }
+      return FormFailure('Erro de conexão: ${e.message}');
+    } catch (e) {
+      debugPrint("ERRO INESPERADO: $e");
+      return FormFailure('Ocorreu um erro inesperado: $e');
+    }
+  }
+
+  @override
+  Future<FormResult> updateForm(FormDataEntity formDataEntity) async {
+    try {
+      final dio = Dio();
+      final formData = FormData();
+
+      final String? token = getTokenFromUrl();
+      if (token == null) return FormFailure('Token não encontrado na URL.');
+
+      final String? patientId = await fetchPatientIdByToken(token);
+      if (patientId == null) {
+        return FormFailure('Token inválido ou paciente não encontrado.');
+      }
+
+      formData.fields.add(MapEntry('patientId', patientId));
+
+      final dynamicData = {
+        "surgery": formDataEntity.surgery,
+        "surgeon": formDataEntity.surgeon,
+        "hospital": formDataEntity.hospital,
+        "gender": formDataEntity.gender,
+        "weight": formDataEntity.weight,
+        "height": formDataEntity.height,
+        "hasAllergies": formDataEntity.hasAllergies,
+        "allergiesDetail": formDataEntity.allergiesDetail,
+        "hasDiseases": formDataEntity.hasDiseases,
+        "diseasesDetail": formDataEntity.diseasesDetail,
+        "usesMedication": formDataEntity.usesMedication,
+        "medicationsDetail": formDataEntity.medicationsDetail,
+        "smokes": formDataEntity.smokes,
+        "usesDrugs": formDataEntity.usesDrugs,
+        "drugsDetail": formDataEntity.drugsDetail,
+        "icuHistory": formDataEntity.icuHistory,
+        "icuHistoryDetail": formDataEntity.icuHistoryDetail,
+        "disabilities": formDataEntity.disabilities,
+        "disabilitiesDetail": formDataEntity.disabilitiesDetail,
+        "hasPreviousSurgeries": formDataEntity.hasPreviousSurgeries,
+        "previousSurgeriesDetail": formDataEntity.previousSurgeriesDetail,
+        "postOpComplications": formDataEntity.postOpComplications,
+        "familyAnesthesiaHistory": formDataEntity.familyAnesthesiaHistory,
+      };
+
+      dynamicData.forEach((key, value) {
+        if (value != null) {
+          formData.fields.add(MapEntry('data[$key]', value.toString()));
+        }
+      });
 
       await dio.post('http://localhost:3000/v1/analysis', data: formData);
 

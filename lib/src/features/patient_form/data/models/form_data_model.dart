@@ -1,4 +1,33 @@
+import 'dart:typed_data';
+import 'package:encrypt/encrypt.dart';
+import 'package:convert/convert.dart';
 import '../../../features.dart';
+
+String decryptField(String? cipherTextWithIv) {
+  if (cipherTextWithIv == null) return '';
+
+  try {
+    final parts = cipherTextWithIv.split(':');
+    if (parts.length != 2) return cipherTextWithIv;
+
+    final ivBytes = Uint8List.fromList(hex.decode(parts[0]));
+    final cipherBytes = Uint8List.fromList(hex.decode(parts[1]));
+
+    final key = Key.fromUtf8("a1gjklJ1oN2GxRiyzEM1Ou6xQ5P010hK");
+    if (key.length != 32) {
+      throw ArgumentError('A chave deve ter 32 bytes para AES-256-CBC');
+    }
+
+    final iv = IV(ivBytes);
+
+    final encrypter = Encrypter(AES(key, mode: AESMode.cbc, padding: 'PKCS7'));
+    final encrypted = Encrypted(cipherBytes);
+
+    return encrypter.decrypt(encrypted, iv: iv);
+  } catch (e) {
+    return cipherTextWithIv;
+  }
+}
 
 class FormDataModel extends FormDataEntity {
   FormDataModel({
@@ -28,82 +57,110 @@ class FormDataModel extends FormDataEntity {
   });
 
   Map<String, dynamic> toMap() => {
-        'surgery': surgery,
-        'surgeon': surgeon,
-        'hospital': hospital,
-        'gender': gender,
-        'weight': weight,
-        'height': height,
-        'hasAllergies': hasAllergies,
-        'allergiesDetail': allergiesDetail,
-        'hasDiseases': hasDiseases,
-        'diseasesDetail': diseasesDetail,
-        'usesMedication': usesMedication,
-        'medicationsDetail': medicationsDetail,
-        'smokes': smokes,
-        'usesDrugs': usesDrugs,
-        'drugsDetail': drugsDetail,
-        'icuHistory': icuHistory,
-        'icuHistoryDetail': icuHistoryDetail,
-        'disabilities': disabilities,
-        'disabilitiesDetail': disabilitiesDetail,
-        'hasPreviousSurgeries': hasPreviousSurgeries,
-        'previousSurgeriesDetail': previousSurgeriesDetail,
-        'postOpComplications': postOpComplications,
-        'familyAnesthesiaHistory': familyAnesthesiaHistory,
-      };
+    'surgery': surgery,
+    'surgeon': surgeon,
+    'hospital': hospital,
+    'gender': gender,
+    'weight': weight,
+    'height': height,
+    'hasAllergies': hasAllergies,
+    'allergiesDetail': allergiesDetail,
+    'hasDiseases': hasDiseases,
+    'diseasesDetail': diseasesDetail,
+    'usesMedication': usesMedication,
+    'medicationsDetail': medicationsDetail,
+    'smokes': smokes,
+    'usesDrugs': usesDrugs,
+    'drugsDetail': drugsDetail,
+    'icuHistory': icuHistory,
+    'icuHistoryDetail': icuHistoryDetail,
+    'disabilities': disabilities,
+    'disabilitiesDetail': disabilitiesDetail,
+    'hasPreviousSurgeries': hasPreviousSurgeries,
+    'previousSurgeriesDetail': previousSurgeriesDetail,
+    'postOpComplications': postOpComplications,
+    'familyAnesthesiaHistory': familyAnesthesiaHistory,
+  };
 
   factory FormDataModel.fromMap(Map<String, dynamic> map) {
-
-    final mock = {
-  "surgery": "Apendicectomia",
-  "surgeon": "Dr. João Silva",
-  "hospital": "Hospital Central",
-  "gender": "F",
-  "weight": 68.5,
-  "height": 1.65,
-  "hasAllergies": true,
-  "allergiesDetail": "Penicilina",
-  "hasDiseases": true,
-  "diseasesDetail": "Diabetes tipo 2",
-  "usesMedication": true,
-  "medicationsDetail": "Metformina 500mg, duas vezes ao dia",
-  "smokes": false,
-  "usesDrugs": false,
-  "drugsDetail": "",
-  "icuHistory": true,
-  "icuHistoryDetail": "Internação por pneumonia em 2021",
-  "disabilities": false,
-  "disabilitiesDetail": "",
-  "hasPreviousSurgeries": true,
-  "previousSurgeriesDetail": "Cesárea em 2018",
-  "postOpComplications": "Nenhuma até o momento",
-  "familyAnesthesiaHistory": "Avó teve reação adversa à anestesia geral"
-};
     return FormDataModel(
-      surgery: mock['surgery'] as String?,
-      surgeon: mock['surgeon'] as String?,
-      hospital: mock['hospital'] as String?,
-      gender: mock['gender'] as String?,
-      weight: (mock['weight'] as num?)?.toDouble(),
-      height: (mock['height'] as num?)?.toDouble(),
-      hasAllergies: mock['hasAllergies'] as bool?,
-      allergiesDetail: mock['allergiesDetail'] as String?,
-      hasDiseases: mock['hasDiseases'] as bool?,
-      diseasesDetail: mock['diseasesDetail'] as String?,
-      usesMedication: mock['usesMedication'] as bool?,
-      medicationsDetail: mock['medicationsDetail'] as String?,
-      smokes: mock['smokes'] as bool?,
-      usesDrugs: mock['usesDrugs'] as bool?,
-      drugsDetail: mock['drugsDetail'] as String?,
-      icuHistory: mock['icuHistory'] as bool?,
-      icuHistoryDetail: mock['icuHistoryDetail'] as String?,
-      disabilities: mock['disabilities'] as bool?,
-      disabilitiesDetail: mock['disabilitiesDetail'] as String?,
-      hasPreviousSurgeries: mock['hasPreviousSurgeries'] as bool?,
-      previousSurgeriesDetail: mock['previousSurgeriesDetail'] as String?,
-      postOpComplications: mock['postOpComplications'] as String?,
-      familyAnesthesiaHistory: mock['familyAnesthesiaHistory'] as String?,
+      surgery: decryptField(map['surgery']),
+      surgeon: decryptField(map['surgeon']),
+      hospital: decryptField(map['hospital']),
+      gender: decryptField(map['gender']),
+      weight: double.tryParse(decryptField(map['weight'])),
+      height: double.tryParse(decryptField(map['height'])),
+      hasAllergies: map['hasAllergies'] as bool?, // se bool já vier em claro
+      allergiesDetail: decryptField(map['allergiesDetail']),
+      hasDiseases: map['hasDiseases'] as bool?,
+      diseasesDetail: decryptField(map['diseasesDetail']),
+      usesMedication: map['usesMedication'] as bool?,
+      medicationsDetail: decryptField(map['medicationsDetail']),
+      smokes: map['smokes'] as bool?,
+      usesDrugs: map['usesDrugs'] as bool?,
+      drugsDetail: decryptField(map['drugsDetail']),
+      icuHistory: map['icuHistory'] as bool?,
+      icuHistoryDetail: decryptField(map['icuHistoryDetail']),
+      disabilities: map['disabilities'] as bool?,
+      disabilitiesDetail: decryptField(map['disabilitiesDetail']),
+      hasPreviousSurgeries: map['hasPreviousSurgeries'] as bool?,
+      previousSurgeriesDetail: decryptField(map['previousSurgeriesDetail']),
+      postOpComplications: decryptField(map['postOpComplications']),
+      familyAnesthesiaHistory: decryptField(map['familyAnesthesiaHistory']),
+    );
+  }
+
+  FormDataModel copyWith({
+    String? surgery,
+    String? surgeon,
+    String? hospital,
+    String? gender,
+    double? weight,
+    double? height,
+    bool? hasAllergies,
+    String? allergiesDetail,
+    bool? hasDiseases,
+    String? diseasesDetail,
+    bool? usesMedication,
+    String? medicationsDetail,
+    bool? smokes,
+    bool? usesDrugs,
+    String? drugsDetail,
+    bool? icuHistory,
+    String? icuHistoryDetail,
+    bool? disabilities,
+    String? disabilitiesDetail,
+    bool? hasPreviousSurgeries,
+    String? previousSurgeriesDetail,
+    String? postOpComplications,
+    String? familyAnesthesiaHistory,
+  }) {
+    return FormDataModel(
+      surgery: surgery ?? this.surgery,
+      surgeon: surgeon ?? this.surgeon,
+      hospital: hospital ?? this.hospital,
+      gender: gender ?? this.gender,
+      weight: weight ?? this.weight,
+      height: height ?? this.height,
+      hasAllergies: hasAllergies ?? this.hasAllergies,
+      allergiesDetail: allergiesDetail ?? this.allergiesDetail,
+      hasDiseases: hasDiseases ?? this.hasDiseases,
+      diseasesDetail: diseasesDetail ?? this.diseasesDetail,
+      usesMedication: usesMedication ?? this.usesMedication,
+      medicationsDetail: medicationsDetail ?? this.medicationsDetail,
+      smokes: smokes ?? this.smokes,
+      usesDrugs: usesDrugs ?? this.usesDrugs,
+      drugsDetail: drugsDetail ?? this.drugsDetail,
+      icuHistory: icuHistory ?? this.icuHistory,
+      icuHistoryDetail: icuHistoryDetail ?? this.icuHistoryDetail,
+      disabilities: disabilities ?? this.disabilities,
+      disabilitiesDetail: disabilitiesDetail ?? this.disabilitiesDetail,
+      hasPreviousSurgeries: hasPreviousSurgeries ?? this.hasPreviousSurgeries,
+      previousSurgeriesDetail:
+          previousSurgeriesDetail ?? this.previousSurgeriesDetail,
+      postOpComplications: postOpComplications ?? this.postOpComplications,
+      familyAnesthesiaHistory:
+          familyAnesthesiaHistory ?? this.familyAnesthesiaHistory,
     );
   }
 }

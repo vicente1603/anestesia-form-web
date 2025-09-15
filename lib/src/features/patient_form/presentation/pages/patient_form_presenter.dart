@@ -82,4 +82,23 @@ class PatientFormPresenter extends BasePresenter {
       return FormFailure('Ocorreu um erro inesperado: $e');
     }
   }
+
+  Future<FormResult> update(FormDataEntity formData) async {
+    state.value = UILoadingState();
+
+    try {
+      final result = await patientFormRepository.updateForm(formData);
+
+      if (result is FormSuccess) {
+        state.value = UISuccessState('');
+      } else if (result is FormFailure) {
+        state.value = UIErrorState(result.message);
+      }
+
+      return result;
+    } catch (e) {
+      state.value = UIErrorState(e.toString());
+      return FormFailure('Ocorreu um erro inesperado: $e');
+    }
+  }
 }
