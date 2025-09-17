@@ -110,7 +110,7 @@ class PatientsPresenter extends BasePresenter {
   }
 
   Future<void> sendLink(BuildContext context, String token) async {
-    final link = 'https://anestesia-app-bdf0d.web.app?token=$token';
+    final link = 'https://anestesia-app-bdf0d.web.app?patient-form?token=$token';
 
     try {
       await Clipboard.setData(ClipboardData(text: link));

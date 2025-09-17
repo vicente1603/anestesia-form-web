@@ -50,6 +50,14 @@ class AdminPresenter extends BasePresenter {
     await adminmRepository.deleteDoctor(doctor);
   }
 
+  Future<void> disableDoctor(DoctorEntity doctor) async {
+    await adminmRepository.disableDoctor(doctor);
+  }
+
+  Future<void> enableDoctor(DoctorEntity doctor) async {
+    await adminmRepository.enableDoctor(doctor);
+  }
+
   Future<void> getDoctors() async {
     state.value = UILoadingState();
 

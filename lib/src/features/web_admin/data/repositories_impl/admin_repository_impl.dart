@@ -51,4 +51,26 @@ class AdminRepositoryImpl implements AdminRepository {
       print(e);
     }
   }
+
+    @override
+  Future<void> disableDoctor(DoctorEntity doctor) async {
+    try {
+      final dio = Dio();
+
+      await dio.put('http://localhost:3000/v1/doctor/disable/${doctor.uid}');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+    @override
+  Future<void> enableDoctor(DoctorEntity doctor) async {
+    try {
+      final dio = Dio();
+
+      await dio.put('http://localhost:3000/v1/doctor/enable/${doctor.uid}');
+    } catch (e) {
+      print(e);
+    }
+  }
 }

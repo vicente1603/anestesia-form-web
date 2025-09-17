@@ -124,7 +124,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
                               DataColumn(label: Text("CRM")),
                               DataColumn(label: Text("E-mail")),
                               DataColumn(label: Text("Habilitado")),
-                              DataColumn(label: Text("Ações")),
                             ],
                             rows:
                                 doctors.map((doctor) {
@@ -133,98 +132,12 @@ class _AdminHomePageState extends State<AdminHomePage> {
                                       DataCell(Text(doctor.fullName)),
                                       DataCell(Text(doctor.crm)),
                                       DataCell(Text(doctor.email)),
-                                      DataCell(Text('Sim')),
                                       DataCell(
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.delete,
-                                            color: Colors.red,
-                                          ),
-                                          onPressed: () async {
-                                            final confirmed = await showDialog<
-                                              bool
-                                            >(
-                                              context: context,
-                                              barrierDismissible: false,
-                                              builder: (context) {
-                                                final color =
-                                                    Theme.of(
-                                                      context,
-                                                    ).colorScheme;
-
-                                                return AlertDialog(
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          16,
-                                                        ),
-                                                  ),
-                                                  title: const Text(
-                                                    'Excluir médico',
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  content: const Text(
-                                                    'Tem certeza que deseja excluir este médico?',
-                                                  ),
-                                                  actionsPadding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 16,
-                                                        vertical: 8,
-                                                      ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed:
-                                                          () => Navigator.of(
-                                                            context,
-                                                          ).pop(false),
-                                                      style:
-                                                          TextButton.styleFrom(
-                                                            foregroundColor:
-                                                                color.onSurface,
-                                                          ),
-                                                      child: const Text(
-                                                        'Cancelar',
-                                                      ),
-                                                    ),
-                                                    ElevatedButton(
-                                                      onPressed: () {
-                                                        Navigator.of(
-                                                          context,
-                                                        ).pop(true);
-                                                      },
-                                                      style: ElevatedButton.styleFrom(
-                                                        backgroundColor:
-                                                            color.error,
-                                                        foregroundColor:
-                                                            color.onPrimary,
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                12,
-                                                              ),
-                                                        ),
-                                                      ),
-                                                      child: const Text(
-                                                        'Excluir',
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-
-                                            if (confirmed == true) {
-                                              widget.adminPresenter
-                                                  .deleteDoctor(doctor);
-
-                                              if (context.mounted) {
-                                                Navigator.pop(context, true);
-                                              }
-                                            }
-                                          },
+                                        Switch(
+                                          value: true,
+                                          onChanged:
+                                              (value) => widget.adminPresenter
+                                                  .disableDoctor(doctor),
                                         ),
                                       ),
                                     ],
