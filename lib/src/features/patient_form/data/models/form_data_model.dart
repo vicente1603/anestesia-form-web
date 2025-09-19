@@ -54,6 +54,11 @@ class FormDataModel extends FormDataEntity {
     super.previousSurgeriesDetail,
     super.postOpComplications,
     super.familyAnesthesiaHistory,
+    required super.formId,
+    required super.formStatus,
+    required super.token,
+    required super.createAt,
+    required super.updatedAt,
   });
 
   Map<String, dynamic> toMap() => {
@@ -80,6 +85,11 @@ class FormDataModel extends FormDataEntity {
     'previousSurgeriesDetail': previousSurgeriesDetail,
     'postOpComplications': postOpComplications,
     'familyAnesthesiaHistory': familyAnesthesiaHistory,
+    'formId': formId,
+    'formStatus': formStatus,
+    'token': token,
+    'createAt': createAt,
+    'updatedAt': updatedAt,
   };
 
   factory FormDataModel.fromMap(Map<String, dynamic> map) {
@@ -90,7 +100,7 @@ class FormDataModel extends FormDataEntity {
       gender: decryptField(map['gender']),
       weight: double.tryParse(decryptField(map['weight'])),
       height: double.tryParse(decryptField(map['height'])),
-      hasAllergies: map['hasAllergies'] as bool?, // se bool já vier em claro
+      hasAllergies: map['hasAllergies'] as bool?,
       allergiesDetail: decryptField(map['allergiesDetail']),
       hasDiseases: map['hasDiseases'] as bool?,
       diseasesDetail: decryptField(map['diseasesDetail']),
@@ -107,6 +117,11 @@ class FormDataModel extends FormDataEntity {
       previousSurgeriesDetail: decryptField(map['previousSurgeriesDetail']),
       postOpComplications: decryptField(map['postOpComplications']),
       familyAnesthesiaHistory: decryptField(map['familyAnesthesiaHistory']),
+      formId: decryptField(map['formId']),
+      formStatus: decryptField(map['formStatus']),
+      token: decryptField(map['token']),
+      createAt: decryptField(map['createAt'] as String?),
+      updatedAt: decryptField(map['updatedAt'] as String?),
     );
   }
 
@@ -134,6 +149,11 @@ class FormDataModel extends FormDataEntity {
     String? previousSurgeriesDetail,
     String? postOpComplications,
     String? familyAnesthesiaHistory,
+    String? formId,
+    String? formStatus,
+    String? token,
+    String? createAt,
+    String? updatedAt,
   }) {
     return FormDataModel(
       surgery: surgery ?? this.surgery,
@@ -161,6 +181,11 @@ class FormDataModel extends FormDataEntity {
       postOpComplications: postOpComplications ?? this.postOpComplications,
       familyAnesthesiaHistory:
           familyAnesthesiaHistory ?? this.familyAnesthesiaHistory,
+      formId: formId ?? this.formId,
+      formStatus: formStatus ?? this.formStatus,
+      token: token ?? this.token,
+      createAt: createAt ?? this.createAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }

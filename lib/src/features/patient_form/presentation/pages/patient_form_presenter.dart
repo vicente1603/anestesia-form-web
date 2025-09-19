@@ -21,7 +21,13 @@ class PatientFormPresenter extends BasePresenter {
   @override
   Future<void> init() async {
     state = ValueNotifier(UIInitialState());
-    formDataEntity = FormDataEntity();
+    formDataEntity = FormDataEntity(
+      formId: '',
+      formStatus: '',
+      token: '',
+      createAt: '',
+      updatedAt: '',
+    );
     isTokenValid = false;
     infoEntity = InfoEntity(birthDate: DateTime.now(), fullName: '');
   }

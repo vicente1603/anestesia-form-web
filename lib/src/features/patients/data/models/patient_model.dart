@@ -8,23 +8,19 @@ class PatientModel extends PatientEntity {
     required super.fullName,
     required super.email,
     required super.createdBySecretary,
-    required super.formStatus,
-    required super.token,
-    required super.formSentAt,
     required super.createdAt,
     required super.doctorId,
     required super.cpf,
     required super.phone,
     required super.birthDate,
     required super.medicalInsurance,
+    required super.forms,
   });
 
   Map<String, dynamic> toMap() => {
     'full_name': fullName,
     'email': email,
     'createdBySecretary': createdBySecretary,
-    'formStatus': formStatus,
-    'token': token,
     'formSentAt': FieldValue.serverTimestamp(),
     'createdAt': FieldValue.serverTimestamp(),
     'doctorId': doctorId,
@@ -32,7 +28,7 @@ class PatientModel extends PatientEntity {
     'phone': phone,
     'birthDate': birthDate,
     'medicalInsurance': medicalInsurance,
-    'form': form,
+    'form': forms,
   };
 
   factory PatientModel.fromMap(String id, Map<String, dynamic> map) {
@@ -41,15 +37,18 @@ class PatientModel extends PatientEntity {
       fullName: map['full_name'],
       email: map['email'],
       createdBySecretary: map['createdBySecretary'],
-      formStatus: map['formStatus'],
-      token: map['token'],
-      formSentAt: map['formSentAt'],
       createdAt: map['createdAt'],
       doctorId: map['doctorId'],
       cpf: map['cpf'],
       phone: map['phone'],
       birthDate: map['birthDate'],
       medicalInsurance: map['medicalInsurance'],
+      forms:
+          map["forms"] != null
+              ? (map["forms"] as List)
+                  .map((e) => FormDataModel.fromMap(e))
+                  .toList()
+              : [],
     );
   }
 }

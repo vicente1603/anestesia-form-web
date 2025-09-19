@@ -23,7 +23,13 @@ class PatientFormPage extends StatefulWidget {
 
 class _PatientFormPageState extends State<PatientFormPage> {
   final formKey = GlobalKey<FormState>();
-  final model = FormDataModel();
+  final model = FormDataModel(
+    formId: '',
+    formStatus: '',
+    token: '',
+    createAt: '',
+    updatedAt: '',
+  );
   String patientName = '';
   String patientBirthDate = '';
 

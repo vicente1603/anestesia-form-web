@@ -8,8 +8,7 @@ class PatientFormRepositoryImpl implements PatientFormRepository {
   PatientFormRepositoryImpl();
 
   String? getTokenFromUrl() {
-    final uri =
-        Uri.base; // Exemplo: https://anestesia-app.web.app/formulario?token=XYZ123
+    final uri = Uri.base;
     return uri.queryParameters['token'];
   }
 
@@ -117,6 +116,11 @@ class PatientFormRepositoryImpl implements PatientFormRepository {
         "previousSurgeriesDetail": formDataEntity.previousSurgeriesDetail,
         "postOpComplications": formDataEntity.postOpComplications,
         "familyAnesthesiaHistory": formDataEntity.familyAnesthesiaHistory,
+        "formId": formDataEntity.formId,
+        "formStatus": formDataEntity.formStatus,
+        "token": formDataEntity.token,
+        "createAt": formDataEntity.createAt,
+        "updatedAt": formDataEntity.updatedAt,
       };
 
       dynamicData.forEach((key, value) {
@@ -125,21 +129,10 @@ class PatientFormRepositoryImpl implements PatientFormRepository {
         }
       });
 
-      // if (arquivoSelecionado != null) {
-      //   final reader = html.FileReader();
-      //   reader.readAsArrayBuffer(arquivoSelecionado);
-      //   await reader.onLoad.first;
-      //   final bytes = reader.result as Uint8List;
-
-      //   final multipartFile = MultipartFile.fromBytes(
-      //     bytes,
-      //     filename: arquivoSelecionado.name,
-      //     contentType: MediaType.parse(arquivoSelecionado.type),
-      //   );
-      //   formData.files.add(MapEntry('fileUrl', multipartFile));
-      // }
-
-      await dio.post('http://localhost:3000/v1/analysis', data: formData);
+      await dio.put(
+        'http://localhost:3000/v1/form/send/patient/$patientId/token/${formDataEntity.token}',
+        data: formData,
+      );
 
       return FormSuccess();
     } on DioException catch (e) {
@@ -204,7 +197,10 @@ class PatientFormRepositoryImpl implements PatientFormRepository {
         }
       });
 
-      await dio.post('http://localhost:3000/v1/analysis', data: formData);
+      await dio.put(
+        'http://localhost:3000/v1/form/send/patient/$patientId/token/${formDataEntity.token}',
+        data: formData,
+      );
 
       return FormSuccess();
     } on DioException catch (e) {

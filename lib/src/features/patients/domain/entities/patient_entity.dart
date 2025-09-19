@@ -9,12 +9,9 @@ class PatientEntity {
   final DateTime birthDate;
   final String doctorId;
   final String? createdBySecretary;
-  final String? formStatus;
-  final String? token;
-  final DateTime? formSentAt;
   final DateTime? createdAt;
   final String medicalInsurance;
-  final FormDataEntity? form;
+  final List<FormDataEntity> forms;
 
   const PatientEntity({
     required this.id,
@@ -25,11 +22,8 @@ class PatientEntity {
     required this.doctorId,
     required this.birthDate,
     this.createdBySecretary,
-    this.formStatus,
-    this.token,
-    this.formSentAt,
     this.createdAt,
     required this.medicalInsurance,
-    this.form,
+    required this.forms,
   });
 }

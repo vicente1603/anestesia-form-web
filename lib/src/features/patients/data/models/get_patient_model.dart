@@ -9,10 +9,8 @@ class GetPatientModel extends PatientEntity {
     required super.cpf,
     required super.phone,
     required super.birthDate,
-    required super.token,
     required super.medicalInsurance,
-    required super.form,
-    required super.formStatus,
+    required super.forms,
   });
 
   factory GetPatientModel.fromMap(String id, Map<String, dynamic> map) {
@@ -24,10 +22,13 @@ class GetPatientModel extends PatientEntity {
       cpf: map['cpf'],
       phone: map['phone'],
       birthDate: map['birthDate'].toDate(),
-      token: map['token'],
       medicalInsurance: map['medicalInsurance'],
-      form: map['forms'] != null ? FormDataModel.fromMap(map['forms']) : null,
-      formStatus: map['formStatus'],
+      forms:
+          map["forms"] != null
+              ? (map["forms"] as List)
+                  .map((e) => FormDataModel.fromMap(e))
+                  .toList()
+              : [],
     );
   }
 
@@ -39,10 +40,8 @@ class GetPatientModel extends PatientEntity {
       'cpf': cpf,
       'phone': phone,
       'birthDate': birthDate,
-      'token': token,
       'medicalInsurance': medicalInsurance,
-      'form': form,
-      'formStatus': formStatus,
+      'forms': forms,
     };
   }
 }

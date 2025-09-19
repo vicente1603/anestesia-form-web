@@ -22,6 +22,11 @@ class FormDataEntity {
   final String? previousSurgeriesDetail;
   final String? postOpComplications;
   final String? familyAnesthesiaHistory;
+  final String formId;
+  final String formStatus;
+  final String token;
+  final String createAt;
+  final String updatedAt;
 
   const FormDataEntity({
     this.surgery,
@@ -47,6 +52,11 @@ class FormDataEntity {
     this.previousSurgeriesDetail,
     this.postOpComplications,
     this.familyAnesthesiaHistory,
+    required this.formId,
+    required this.formStatus,
+    required this.token,
+    required this.createAt,
+    required this.updatedAt,
   });
 
   FormDataEntity copyWith({
@@ -73,6 +83,11 @@ class FormDataEntity {
     String? previousSurgeriesDetail,
     String? postOpComplications,
     String? familyAnesthesiaHistory,
+    String? formId,
+    String? formStatus,
+    String? token,
+    String? createAt,
+    String? updatedAt,
   }) {
     return FormDataEntity(
       surgery: surgery ?? this.surgery,
@@ -100,6 +115,11 @@ class FormDataEntity {
       postOpComplications: postOpComplications ?? this.postOpComplications,
       familyAnesthesiaHistory:
           familyAnesthesiaHistory ?? this.familyAnesthesiaHistory,
+      formId: formId ?? this.formId,
+      formStatus: formStatus ?? this.formStatus,
+      token: token ?? this.token,
+      createAt: createAt ?? this.createAt,
+      updatedAt: createAt ?? this.createAt,
     );
   }
 }

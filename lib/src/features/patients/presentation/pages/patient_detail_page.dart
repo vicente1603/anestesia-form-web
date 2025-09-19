@@ -1,6 +1,33 @@
 import 'package:flutter/material.dart';
 import '../../../features.dart';
 
+extension FormDataMapper on FormDataEntity {
+  FormDataModel toModel() {
+    return FormDataModel(
+      surgery: surgery,
+      surgeon: surgeon,
+      hospital: hospital,
+      gender: gender,
+      weight: weight,
+      height: height,
+      allergiesDetail: allergiesDetail,
+      diseasesDetail: diseasesDetail,
+      medicationsDetail: medicationsDetail,
+      drugsDetail: drugsDetail,
+      icuHistoryDetail: icuHistoryDetail,
+      disabilitiesDetail: disabilitiesDetail,
+      previousSurgeriesDetail: previousSurgeriesDetail,
+      postOpComplications: postOpComplications,
+      familyAnesthesiaHistory: familyAnesthesiaHistory,
+      formId: formId,
+      formStatus: formStatus,
+      token: token,
+      createAt: createAt,
+      updatedAt: updatedAt,
+    );
+  }
+}
+
 class PatientDetailPage extends StatefulWidget {
   final GetPatientModel patient;
   final PatientsPresenter patientsPresenter;
@@ -18,90 +45,75 @@ class PatientDetailPage extends StatefulWidget {
 }
 
 class _PatientDetailPageState extends State<PatientDetailPage> {
-  bool isEditingForm = false;
+  late List<FormDataEntity> sentForms;
+  late List<FormDataEntity> pendingForms;
 
-  late TextEditingController surgeryController;
-  late TextEditingController surgeonController;
-  late TextEditingController hospitalController;
-  late TextEditingController genderController;
-  late TextEditingController weightController;
-  late TextEditingController heightController;
-  late TextEditingController allergiesDetailController;
-  late TextEditingController diseasesDetailController;
-  late TextEditingController medicationsDetailController;
-  late TextEditingController drugsDetailController;
-  late TextEditingController icuHistoryDetailController;
-  late TextEditingController disabilitiesDetailController;
-  late TextEditingController previousSurgeriesDetailController;
-  late TextEditingController postOpComplicationsController;
-  late TextEditingController familyAnesthesiaHistoryController;
-
-  late FormDataModel formModel;
+  // Cada form terá seu próprio TextEditingController set
+  late Map<String, Map<String, TextEditingController>> formControllers;
+  late Map<String, FormDataModel> formModels;
+  late Map<String, bool> isEditingFormMap;
 
   @override
   void initState() {
     super.initState();
+    _separateForms();
+    _initializeControllers();
+  }
 
-    if (widget.patient.form != null) {
-      formModel = widget.patient.form as FormDataModel;
+  void _separateForms() {
+    sentForms =
+        widget.patient.forms.where((f) => f.formStatus == 'send').toList();
+    pendingForms =
+        widget.patient.forms.where((f) => f.formStatus == 'pending').toList();
+  }
 
-      surgeryController = TextEditingController(text: formModel.surgery);
-      surgeonController = TextEditingController(text: formModel.surgeon);
-      hospitalController = TextEditingController(text: formModel.hospital);
-      genderController = TextEditingController(text: formModel.gender);
-      weightController = TextEditingController(
-        text: formModel.weight.toString(),
-      );
-      heightController = TextEditingController(
-        text: formModel.height.toString(),
-      );
-      allergiesDetailController = TextEditingController(
-        text: formModel.allergiesDetail,
-      );
-      diseasesDetailController = TextEditingController(
-        text: formModel.diseasesDetail,
-      );
-      medicationsDetailController = TextEditingController(
-        text: formModel.medicationsDetail,
-      );
-      drugsDetailController = TextEditingController(
-        text: formModel.drugsDetail,
-      );
-      icuHistoryDetailController = TextEditingController(
-        text: formModel.icuHistoryDetail,
-      );
-      disabilitiesDetailController = TextEditingController(
-        text: formModel.disabilitiesDetail,
-      );
-      previousSurgeriesDetailController = TextEditingController(
-        text: formModel.previousSurgeriesDetail,
-      );
-      postOpComplicationsController = TextEditingController(
-        text: formModel.postOpComplications,
-      );
-      familyAnesthesiaHistoryController = TextEditingController(
-        text: formModel.familyAnesthesiaHistory,
-      );
+  void _initializeControllers() {
+    formControllers = {};
+    formModels = {};
+    isEditingFormMap = {};
+
+    for (var form in sentForms) {
+      final model = form.toModel();
+      formModels[form.formId] = model;
+      isEditingFormMap[form.formId] = false;
+
+      formControllers[form.formId] = {
+        'surgery': TextEditingController(text: model.surgery),
+        'surgeon': TextEditingController(text: model.surgeon),
+        'hospital': TextEditingController(text: model.hospital),
+        'gender': TextEditingController(text: model.gender),
+        'weight': TextEditingController(text: model.weight?.toString() ?? ''),
+        'height': TextEditingController(text: model.height?.toString() ?? ''),
+        'allergiesDetail': TextEditingController(text: model.allergiesDetail),
+        'diseasesDetail': TextEditingController(text: model.diseasesDetail),
+        'medicationsDetail': TextEditingController(
+          text: model.medicationsDetail,
+        ),
+        'drugsDetail': TextEditingController(text: model.drugsDetail),
+        'icuHistoryDetail': TextEditingController(text: model.icuHistoryDetail),
+        'disabilitiesDetail': TextEditingController(
+          text: model.disabilitiesDetail,
+        ),
+        'previousSurgeriesDetail': TextEditingController(
+          text: model.previousSurgeriesDetail,
+        ),
+        'postOpComplications': TextEditingController(
+          text: model.postOpComplications,
+        ),
+        'familyAnesthesiaHistory': TextEditingController(
+          text: model.familyAnesthesiaHistory,
+        ),
+      };
     }
   }
 
   @override
   void dispose() {
-    surgeryController.dispose();
-    surgeonController.dispose();
-    hospitalController.dispose();
-    genderController.dispose();
-    weightController.dispose();
-    heightController.dispose();
-    allergiesDetailController.dispose();
-    diseasesDetailController.dispose();
-    medicationsDetailController.dispose();
-    drugsDetailController.dispose();
-    icuHistoryDetailController.dispose();
-    disabilitiesDetailController.dispose();
-    previousSurgeriesDetailController.dispose();
-    postOpComplicationsController.dispose();
-    familyAnesthesiaHistoryController.dispose();
+    for (var controllers in formControllers.values) {
+      for (var c in controllers.values) {
+        c.dispose();
+      }
+    }
     super.dispose();
   }
 
@@ -117,8 +129,6 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 16),
-
               _buildInfoTile('Nome', widget.patient.fullName),
               _buildInfoTile('CPF', widget.patient.cpf),
               _buildInfoTile(
@@ -127,19 +137,27 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
               ),
               _buildInfoTile('E-mail', widget.patient.email),
               _buildInfoTile('Telefone', widget.patient.phone),
-
-              if (widget.patient.form != null) _buildFormSection(),
-
               const SizedBox(height: 24),
               const Divider(),
               const SizedBox(height: 24),
 
-              widget.patient.formStatus == 'pending'
+              /// Botão gerar link
+              pendingForms.isNotEmpty
                   ? ElevatedButton(
+                    onPressed: null,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text("Já existe link pendente"),
+                  )
+                  : ElevatedButton(
                     onPressed:
-                        () => widget.patientsPresenter.sendLink(
+                        () => widget.patientsPresenter.generateFormLink(
                           context,
-                          widget.patient.token ?? '',
+                          widget.patient.id,
                         ),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -149,71 +167,29 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'Copiar link do formulário',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  )
-                  : Container(),
-              const SizedBox(height: 16),
+                    child: const Text("Gerar link para paciente"),
+                  ),
+              const SizedBox(height: 24),
 
+              /// Lista de formulários enviados
+              if (sentForms.isNotEmpty) ...[
+                Text(
+                  "Formulários enviados:",
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ...sentForms.map((form) => _buildFormCard(form, color)),
+              ],
+
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 24),
+
+              /// Botão excluir paciente
               ElevatedButton(
-                onPressed: () async {
-                  final confirmed = await showDialog<bool>(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (context) {
-                      final color = Theme.of(context).colorScheme;
-
-                      return AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        title: const Text(
-                          'Excluir paciente',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        content: const Text(
-                          'Tem certeza que deseja excluir este paciente?',
-                        ),
-                        actionsPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            style: TextButton.styleFrom(
-                              foregroundColor: color.onSurface,
-                            ),
-                            child: const Text('Cancelar'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(true);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: color.error,
-                              foregroundColor: color.onPrimary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text('Excluir'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-
-                  if (confirmed == true) {
-                    widget.patientsPresenter.deletePatient(widget.patient);
-
-                    if (context.mounted) {
-                      Navigator.pop(context, true);
-                    }
-                  }
-                },
+                onPressed: _confirmDeletePatient,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: color.error,
@@ -223,7 +199,7 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
                   ),
                 ),
                 child: const Text(
-                  'Excluir paciente',
+                  "Excluir paciente",
                   style: TextStyle(fontSize: 16),
                 ),
               ),
@@ -234,107 +210,117 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
     );
   }
 
-  Widget _buildInfoTile(String label, dynamic value) {
-    String displayValue;
+  Widget _buildFormCard(FormDataEntity form, ColorScheme color) {
+    final controllers = formControllers[form.formId]!;
+    final model = formModels[form.formId]!;
+    final isEditing = isEditingFormMap[form.formId]!;
 
-    if (value == null) {
-      displayValue = 'Não informado';
-    } else if (value is bool) {
-      displayValue = value ? 'Sim' : 'Não';
-    } else {
-      displayValue = value.toString();
-    }
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Formulário #${form.formId}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  children: [
+                    if (isEditing)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: OutlinedButton(
+                          onPressed: () => _cancelEdit(form.formId),
+                          child: const Text("Cancelar"),
+                        ),
+                      ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (isEditing) {
+                          _saveForm(form.formId);
+                        } else {
+                          setState(() => isEditingFormMap[form.formId] = true);
+                        }
+                      },
+                      child: Text(
+                        isEditing ? "Salvar formulário" : "Editar formulário",
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("$label: ", style: const TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(child: Text(displayValue)),
-        ],
+            /// Campos do formulário
+            _buildFormField("Cirurgia", controllers['surgery']!, isEditing),
+            _buildFormField("Cirurgião", controllers['surgeon']!, isEditing),
+            _buildFormField("Hospital", controllers['hospital']!, isEditing),
+            _buildFormField("Sexo", controllers['gender']!, isEditing),
+            _buildFormField("Peso (kg)", controllers['weight']!, isEditing),
+            _buildFormField("Altura (cm)", controllers['height']!, isEditing),
+            _buildFormField(
+              "Detalhes alergias",
+              controllers['allergiesDetail']!,
+              isEditing,
+            ),
+            _buildFormField(
+              "Detalhes doenças",
+              controllers['diseasesDetail']!,
+              isEditing,
+            ),
+            _buildFormField(
+              "Medicamentos",
+              controllers['medicationsDetail']!,
+              isEditing,
+            ),
+            _buildFormField(
+              "Detalhes drogas",
+              controllers['drugsDetail']!,
+              isEditing,
+            ),
+            _buildFormField(
+              "Detalhes UTI",
+              controllers['icuHistoryDetail']!,
+              isEditing,
+            ),
+            _buildFormField(
+              "Detalhes deficiências",
+              controllers['disabilitiesDetail']!,
+              isEditing,
+            ),
+            _buildFormField(
+              "Detalhes cirurgias anteriores",
+              controllers['previousSurgeriesDetail']!,
+              isEditing,
+            ),
+            _buildFormField(
+              "Complicações pós-operatórias",
+              controllers['postOpComplications']!,
+              isEditing,
+            ),
+            _buildFormField(
+              "Histórico familiar de anestesia",
+              controllers['familyAnesthesiaHistory']!,
+              isEditing,
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildFormSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 24),
-        const Divider(),
-        const SizedBox(height: 16),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Formulário preenchido",
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            Row(
-              children: [
-                if (isEditingForm)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: OutlinedButton(
-                      onPressed: _cancelEdit,
-                      child: const Text('Cancelar'),
-                    ),
-                  ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (isEditingForm) {
-                      _saveForm();
-                    } else {
-                      setState(() {
-                        isEditingForm = true;
-                      });
-                    }
-                  },
-                  child: Text(
-                    isEditingForm ? 'Salvar formulário' : 'Editar formulário',
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 12),
-
-        _buildFormField("Cirurgia", surgeryController),
-        _buildFormField("Cirurgião", surgeonController),
-        _buildFormField("Hospital", hospitalController),
-        _buildFormField("Sexo", genderController),
-        _buildFormField("Peso (kg)", weightController),
-        _buildFormField("Altura (cm)", heightController),
-        _buildFormField("Detalhes alergias", allergiesDetailController),
-        _buildFormField("Detalhes doenças", diseasesDetailController),
-        _buildFormField("Medicamentos", medicationsDetailController),
-        _buildFormField("Detalhes drogas", drugsDetailController),
-        _buildFormField("Detalhes UTI", icuHistoryDetailController),
-        _buildFormField("Detalhes deficiências", disabilitiesDetailController),
-        _buildFormField(
-          "Detalhes cirurgias anteriores",
-          previousSurgeriesDetailController,
-        ),
-        _buildFormField(
-          "Complicações pós-operatórias",
-          postOpComplicationsController,
-        ),
-        _buildFormField(
-          "Histórico familiar de anestesia",
-          familyAnesthesiaHistoryController,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFormField(String label, TextEditingController controller) {
-    if (isEditingForm) {
+  Widget _buildFormField(
+    String label,
+    TextEditingController controller,
+    bool isEditing,
+  ) {
+    if (isEditing) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: TextFormField(
@@ -346,34 +332,49 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
         ),
       );
     } else {
-      return _buildInfoTile(label, controller.text);
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "$label: ",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Expanded(
+              child: Text(controller.text.isNotEmpty ? controller.text : "-"),
+            ),
+          ],
+        ),
+      );
     }
   }
 
-  void _saveForm() {
-    final updatedForm = formModel.copyWith(
-      surgery: surgeryController.text,
-      surgeon: surgeonController.text,
-      hospital: hospitalController.text,
-      gender: genderController.text,
-      weight: double.parse(weightController.text),
-      height: double.parse(heightController.text),
-      allergiesDetail: allergiesDetailController.text,
-      diseasesDetail: diseasesDetailController.text,
-      medicationsDetail: medicationsDetailController.text,
-      drugsDetail: drugsDetailController.text,
-      icuHistoryDetail: icuHistoryDetailController.text,
-      disabilitiesDetail: disabilitiesDetailController.text,
-      previousSurgeriesDetail: previousSurgeriesDetailController.text,
-      postOpComplications: postOpComplicationsController.text,
-      familyAnesthesiaHistory: familyAnesthesiaHistoryController.text,
+  void _saveForm(String formId) {
+    final controllers = formControllers[formId]!;
+    final updatedForm = formModels[formId]!.copyWith(
+      surgery: controllers['surgery']!.text,
+      surgeon: controllers['surgeon']!.text,
+      hospital: controllers['hospital']!.text,
+      gender: controllers['gender']!.text,
+      weight: double.tryParse(controllers['weight']!.text),
+      height: double.tryParse(controllers['height']!.text),
+      allergiesDetail: controllers['allergiesDetail']!.text,
+      diseasesDetail: controllers['diseasesDetail']!.text,
+      medicationsDetail: controllers['medicationsDetail']!.text,
+      drugsDetail: controllers['drugsDetail']!.text,
+      icuHistoryDetail: controllers['icuHistoryDetail']!.text,
+      disabilitiesDetail: controllers['disabilitiesDetail']!.text,
+      previousSurgeriesDetail: controllers['previousSurgeriesDetail']!.text,
+      postOpComplications: controllers['postOpComplications']!.text,
+      familyAnesthesiaHistory: controllers['familyAnesthesiaHistory']!.text,
     );
 
     widget.patientFormPresenter.update(updatedForm);
 
     setState(() {
-      formModel = updatedForm;
-      isEditingForm = false;
+      formModels[formId] = updatedForm;
+      isEditingFormMap[formId] = false;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -381,27 +382,100 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
     );
   }
 
-  void _cancelEdit() {
-    surgeryController.text = formModel.surgery ?? '';
-    surgeonController.text = formModel.surgeon ?? '';
-    hospitalController.text = formModel.hospital ?? '';
-    genderController.text = formModel.gender ?? '';
-    weightController.text = formModel.weight.toString();
-    heightController.text = formModel.height.toString();
-    allergiesDetailController.text = formModel.allergiesDetail ?? '';
-    diseasesDetailController.text = formModel.diseasesDetail ?? '';
-    medicationsDetailController.text = formModel.medicationsDetail ?? '';
-    drugsDetailController.text = formModel.drugsDetail ?? '';
-    icuHistoryDetailController.text = formModel.icuHistoryDetail ?? '';
-    disabilitiesDetailController.text = formModel.disabilitiesDetail ?? '';
-    previousSurgeriesDetailController.text =
-        formModel.previousSurgeriesDetail ?? '';
-    postOpComplicationsController.text = formModel.postOpComplications ?? '';
-    familyAnesthesiaHistoryController.text =
-        formModel.familyAnesthesiaHistory ?? '';
+  void _cancelEdit(String formId) {
+    final model = formModels[formId]!;
+    final controllers = formControllers[formId]!;
+
+    controllers['surgery']!.text = model.surgery ?? '';
+    controllers['surgeon']!.text = model.surgeon ?? '';
+    controllers['hospital']!.text = model.hospital ?? '';
+    controllers['gender']!.text = model.gender ?? '';
+    controllers['weight']!.text = model.weight?.toString() ?? '';
+    controllers['height']!.text = model.height?.toString() ?? '';
+    controllers['allergiesDetail']!.text = model.allergiesDetail ?? '';
+    controllers['diseasesDetail']!.text = model.diseasesDetail ?? '';
+    controllers['medicationsDetail']!.text = model.medicationsDetail ?? '';
+    controllers['drugsDetail']!.text = model.drugsDetail ?? '';
+    controllers['icuHistoryDetail']!.text = model.icuHistoryDetail ?? '';
+    controllers['disabilitiesDetail']!.text = model.disabilitiesDetail ?? '';
+    controllers['previousSurgeriesDetail']!.text =
+        model.previousSurgeriesDetail ?? '';
+    controllers['postOpComplications']!.text = model.postOpComplications ?? '';
+    controllers['familyAnesthesiaHistory']!.text =
+        model.familyAnesthesiaHistory ?? '';
 
     setState(() {
-      isEditingForm = false;
+      isEditingFormMap[formId] = false;
     });
+  }
+
+  void _confirmDeletePatient() async {
+    final color = Theme.of(context).colorScheme;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text(
+              'Excluir paciente',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: const Text(
+              'Tem certeza que deseja excluir este paciente?',
+            ),
+            actionsPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 8,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                style: TextButton.styleFrom(foregroundColor: color.onSurface),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: color.error,
+                  foregroundColor: color.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Excluir'),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed == true) {
+      widget.patientsPresenter.deletePatient(widget.patient);
+      if (context.mounted) Navigator.pop(context, true);
+    }
+  }
+
+  Widget _buildInfoTile(String label, dynamic value) {
+    String displayValue;
+    if (value == null) {
+      displayValue = 'Não informado';
+    } else if (value is bool) {
+      displayValue = value ? 'Sim' : 'Não';
+    } else {
+      displayValue = value.toString();
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("$label: ", style: const TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(child: Text(displayValue)),
+        ],
+      ),
+    );
   }
 }

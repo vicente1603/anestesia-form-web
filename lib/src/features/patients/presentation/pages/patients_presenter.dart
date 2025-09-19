@@ -29,6 +29,8 @@ class PatientsPresenter extends BasePresenter {
 
   String secretaryId = '';
 
+  String linkUrl = '';
+
   @override
   Future<void> init() async {
     state = ValueNotifier(UIInitialState());
@@ -90,12 +92,12 @@ class PatientsPresenter extends BasePresenter {
         fullName: fullName,
         email: email,
         createdBySecretary: uid,
-        token: generateToken(),
         doctorId: doctorId,
         cpf: cpf,
         birthDate: birthDate,
         phone: phone,
         medicalInsurance: medicalInsurance,
+        forms: [],
       );
 
       await patientsRepository.registerPatient(patient);
@@ -109,38 +111,21 @@ class PatientsPresenter extends BasePresenter {
     }
   }
 
-  Future<void> sendLink(BuildContext context, String token) async {
-    final link = 'https://anestesia-app-bdf0d.web.app?patient-form?token=$token';
+  Future<String> generateFormLink(BuildContext context, String id) async {
+    state.value = UILoadingState();
 
     try {
-      await Clipboard.setData(ClipboardData(text: link));
+      linkUrl = await patientsRepository.generateFormLink(id);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('✅ Link copiado para a área de transferência'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      state.value = UISuccessState('');
+      return linkUrl;
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('❌ Não foi possível copiar. Abra manualmente: $link'),
-          duration: const Duration(seconds: 4),
-        ),
-      );
+      state.value = UIErrorState(e.toString());
+      return '';
     }
   }
 
   Future<void> deletePatient(PatientEntity patient) async {
     patientsRepository.deletePatient(patient);
-  }
-
-  String generateToken({int length = 6}) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    final rand = Random.secure();
-    return List.generate(
-      length,
-      (_) => chars[rand.nextInt(chars.length)],
-    ).join();
   }
 }
