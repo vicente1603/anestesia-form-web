@@ -78,21 +78,46 @@ class _DoctorPageState extends State<DoctorPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final shouldRefresh = await Navigator.pushNamed(
-            context,
-            '/register-secretary',
-          );
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
 
-          if (shouldRefresh == true) {
-            setState(() {
-              getSecretaries();
-            });
-          }
-        },
-        label: const Text("Criar Secretária"),
-        icon: const Icon(Icons.person_add_alt_1),
+        children: [
+          FloatingActionButton.extended(
+            onPressed: () async {
+              final shouldRefresh = await Navigator.pushNamed(
+                context,
+                '/register-secretary',
+              );
+
+              if (shouldRefresh == true) {
+                setState(() {
+                  getSecretaries();
+                });
+              }
+            },
+            label: const Text("Cadastrar Secretária"),
+            icon: const Icon(Icons.person_add_alt_1),
+          ),
+
+          SizedBox(height: 8),
+
+          FloatingActionButton.extended(
+            onPressed: () async {
+              final shouldRefresh = await Navigator.pushNamed(
+                context,
+                '/register-patient',
+              );
+
+              if (shouldRefresh == true) {
+                setState(() {
+                  getPatients();
+                });
+              }
+            },
+            label: const Text("Cadastrar Paciente"),
+            icon: const Icon(Icons.person_add_alt_1),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

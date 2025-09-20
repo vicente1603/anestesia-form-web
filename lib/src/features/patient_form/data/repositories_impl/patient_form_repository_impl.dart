@@ -7,16 +7,16 @@ import 'dart:html' as html;
 class PatientFormRepositoryImpl implements PatientFormRepository {
   PatientFormRepositoryImpl();
 
-  String? getTokenFromUrl() {
+  String? getPatientIdFromUrl() {
     final uri = Uri.base;
-    return uri.queryParameters['token'];
+    return uri.queryParameters['patientId'];
   }
 
-  Future<String?> fetchPatientIdByToken(String token) async {
+  Future<String?> fetchPatientIdById(String patientId) async {
     final querySnapshot =
         await FirebaseFirestore.instance
             .collection('patients')
-            .where('token', isEqualTo: token)
+            .where('uid', isEqualTo: patientId)
             .limit(1)
             .get();
 
@@ -29,33 +29,50 @@ class PatientFormRepositoryImpl implements PatientFormRepository {
 
   @override
   Future<bool> validateToken() async {
-    final token = Uri.base.queryParameters['token'];
+    try {
+      final patientId = Uri.base.queryParameters['patientId'];
+      final token = Uri.base.queryParameters['token'];
 
-    if (token == null || token.isEmpty) {
+      if (patientId == null ||
+          patientId.isEmpty ||
+          token == null ||
+          token.isEmpty) {
+        return false;
+      }
+
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('patients')
+              .doc(patientId)
+              .get();
+
+      if (!doc.exists) return false;
+
+      final data = doc.data();
+      if (data == null || !data.containsKey('forms')) return false;
+
+      final forms =
+          (data['forms'] as List<dynamic>)
+              .map((e) => Map<String, dynamic>.from(e as Map))
+              .toList();
+
+      final hasValidForm = forms.any(
+        (form) => form['token'] == token && form['formStatus'] == 'pending',
+      );
+
+      return hasValidForm;
+    } catch (e, st) {
+      print('validateToken error: $e');
+      print(st);
       return false;
     }
-
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection('patients')
-            .where('token', isEqualTo: token)
-            .where('formStatus', isEqualTo: 'pending')
-            .limit(1)
-            .get();
-
-    return snapshot.docs.isNotEmpty;
   }
 
   @override
   Future<InfoEntity?> getPatientInfo() async {
-    final token = Uri.base.queryParameters['token'];
+    final patientId = Uri.base.queryParameters['patientId'];
 
-    if (token == null || token.isEmpty) {
-      return null;
-    }
-
-    final String? patientId = await fetchPatientIdByToken(token);
-    if (patientId == null) {
+    if (patientId == null || patientId.isEmpty) {
       return null;
     }
 
@@ -82,15 +99,10 @@ class PatientFormRepositoryImpl implements PatientFormRepository {
       final dio = Dio();
       final formData = FormData();
 
-      final String? token = getTokenFromUrl();
-      if (token == null) return FormFailure('Token não encontrado na URL.');
-
-      final String? patientId = await fetchPatientIdByToken(token);
+      final String? patientId = getPatientIdFromUrl();
       if (patientId == null) {
         return FormFailure('Token inválido ou paciente não encontrado.');
       }
-
-      formData.fields.add(MapEntry('patientId', patientId));
 
       final dynamicData = {
         "surgery": formDataEntity.surgery,
@@ -155,15 +167,10 @@ class PatientFormRepositoryImpl implements PatientFormRepository {
       final dio = Dio();
       final formData = FormData();
 
-      final String? token = getTokenFromUrl();
-      if (token == null) return FormFailure('Token não encontrado na URL.');
-
-      final String? patientId = await fetchPatientIdByToken(token);
+      final String? patientId = getPatientIdFromUrl();
       if (patientId == null) {
         return FormFailure('Token inválido ou paciente não encontrado.');
       }
-
-      formData.fields.add(MapEntry('patientId', patientId));
 
       final dynamicData = {
         "surgery": formDataEntity.surgery,

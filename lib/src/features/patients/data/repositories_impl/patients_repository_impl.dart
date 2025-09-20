@@ -19,7 +19,7 @@ class PatientsRepositoryImpl implements PatientsRepository {
             .get();
 
     return query.docs
-        .map((doc) => GetPatientModel.fromMap(doc.id, doc.data()))
+        .map((doc) => GetPatientModel.fromMap(doc.data()))
         .toList();
   }
 
@@ -28,7 +28,7 @@ class PatientsRepositoryImpl implements PatientsRepository {
     final docRef = _firestore.collection('patients').doc();
 
     final patientModel = PatientModel(
-      id: docRef.id,
+      uid: docRef.id,
       fullName: patient.fullName,
       email: patient.email,
       createdBySecretary: patient.createdBySecretary,
@@ -73,7 +73,7 @@ class PatientsRepositoryImpl implements PatientsRepository {
 
   @override
   Future<void> deletePatient(PatientEntity patient) async {
-    final docRef = _firestore.collection('patients').doc(patient.id);
+    final docRef = _firestore.collection('patients').doc(patient.uid);
 
     await docRef.delete();
   }

@@ -1,7 +1,7 @@
 import 'package:anestesia_web/src/features/features.dart';
 
 class PatientEntity {
-  final String id;
+  final String uid;
   final String fullName;
   final String email;
   final String cpf;
@@ -14,7 +14,7 @@ class PatientEntity {
   final List<FormDataEntity> forms;
 
   const PatientEntity({
-    required this.id,
+    required this.uid,
     required this.fullName,
     required this.email,
     required this.cpf,

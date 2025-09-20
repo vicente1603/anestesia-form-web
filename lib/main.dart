@@ -4,9 +4,19 @@ import 'package:anestesia_web/src/infra/infra.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'dart:js' as js;
+
+void fixGlobal() {
+  if (js.context['global'] == null) {
+    js.context['global'] = js.context;
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  fixGlobal();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final moduleManager = await setup();

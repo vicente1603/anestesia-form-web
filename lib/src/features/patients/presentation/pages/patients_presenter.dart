@@ -80,7 +80,11 @@ class PatientsPresenter extends BasePresenter {
         await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
     if (docSnapshot.exists) {
-      doctorId = docSnapshot.data()?['associatedDoctorId'];
+      if (docSnapshot.data()?['associatedDoctorId'] != null) {
+        doctorId = docSnapshot.data()?['associatedDoctorId'];
+      } else {
+        doctorId = uid;
+      }
       print('Doctor ID: $doctorId');
     } else {
       print('Documento da secretária não existe.');
@@ -88,7 +92,7 @@ class PatientsPresenter extends BasePresenter {
 
     try {
       final patient = PatientEntity(
-        id: '',
+        uid: '',
         fullName: fullName,
         email: email,
         createdBySecretary: uid,

@@ -2,7 +2,7 @@ import '../../../features.dart';
 
 class GetPatientModel extends PatientEntity {
   GetPatientModel({
-    required super.id,
+    required super.uid,
     required super.fullName,
     required super.email,
     required super.doctorId,
@@ -13,9 +13,9 @@ class GetPatientModel extends PatientEntity {
     required super.forms,
   });
 
-  factory GetPatientModel.fromMap(String id, Map<String, dynamic> map) {
+  factory GetPatientModel.fromMap(Map<String, dynamic> map) {
     return GetPatientModel(
-      id: id,
+      uid: map['uid'],
       fullName: map['full_name'],
       email: map['email'],
       doctorId: map['doctorId'],
@@ -34,6 +34,7 @@ class GetPatientModel extends PatientEntity {
 
   Map<String, dynamic> toMap() {
     return {
+      'uid': uid,
       'name': fullName,
       'full_name': email,
       'doctorId': doctorId,

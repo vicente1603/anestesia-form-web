@@ -21,7 +21,7 @@ class _AdminPageState extends State<AdminPage> {
     final dio = Dio();
 
     final response = await dio.post(
-      'http://localhost:3000/v1/users', // ajuste aqui
+      'http://localhost:3000/v1/users', 
       options: Options(contentType: 'application/json'),
       data: jsonEncode({
         'email': email,
@@ -93,7 +93,7 @@ class _AdminPageState extends State<AdminPage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _createUser,
-                child: const Text('Criar Usuário'),
+                child: const Text('Cadastrar Usuário'),
               ),
             ],
           ),

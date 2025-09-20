@@ -157,7 +157,7 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
                     onPressed:
                         () => widget.patientsPresenter.generateFormLink(
                           context,
-                          widget.patient.id,
+                          widget.patient.uid,
                         ),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
